@@ -27,8 +27,8 @@ use Psr\Http\Message\{
 };
 
 /**
- * Class Crypto
- * @package ParagonIE\Psr7Crypto
+ * Class Sapient
+ * @package ParagonIE\Sapient
  */
 class Sapient extends Client
 {
@@ -36,6 +36,10 @@ class Sapient extends Client
     const HEADER_SIGNATURE_NAME = 'Body-Signature-Ed25519';
 
     /**
+     * Create an HTTP request object with a JSON body that is authenticated
+     * with a pre-shared key. The authentication tag is stored in a
+     * Body-HMAC-SHA512256 header.
+     *
      * @param string $method
      * @param string $uri
      * @param array $arrayToJsonify
@@ -51,6 +55,9 @@ class Sapient extends Client
         SharedAuthenticationKey $key,
         array $headers = []
     ): Request {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         /** @var string $body */
         $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
         if (!\is_string($body)) {
@@ -66,6 +73,10 @@ class Sapient extends Client
     }
 
     /**
+     * Create an HTTP response object with a JSON body that is authenticated
+     * with a pre-shared key. The authentication tag is stored in a
+     * Body-HMAC-SHA512256 header.
+     *
      * @param int $status
      * @param array $arrayToJsonify
      * @param SharedAuthenticationKey $key
@@ -81,6 +92,9 @@ class Sapient extends Client
         array $headers = [],
         string $version = '1.1'
     ): Response {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         /** @var string $body */
         $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
         if (!\is_string($body)) {
@@ -96,6 +110,9 @@ class Sapient extends Client
     }
 
     /**
+     * Create an HTTP request object with a JSON body that is encrypted
+     * with a pre-shared key.
+     *
      * @param string $method
      * @param string $uri
      * @param array $arrayToJsonify
@@ -111,6 +128,9 @@ class Sapient extends Client
         SharedEncryptionKey $key,
         array $headers = []
     ): Request {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         /** @var string $body */
         $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
         if (!\is_string($body)) {
@@ -126,6 +146,9 @@ class Sapient extends Client
     }
 
     /**
+     * Create an HTTP response object with a JSON body that is encrypted
+     * with a pre-shared key.
+     *
      * @param int $status
      * @param array $arrayToJsonify
      * @param SharedEncryptionKey $key
@@ -141,6 +164,9 @@ class Sapient extends Client
         array $headers = [],
         string $version = '1.1'
     ): Response {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         /** @var string $body */
         $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
         if (!\is_string($body)) {
@@ -156,6 +182,9 @@ class Sapient extends Client
     }
 
     /**
+     * Create an HTTP request object with a JSON body that is encrypted
+     * with the server's public key.
+     *
      * @param string $method
      * @param string $uri
      * @param array $arrayToJsonify
@@ -171,6 +200,9 @@ class Sapient extends Client
         SealingPublicKey $key,
         array $headers = []
     ): Request {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         /** @var string $body */
         $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
         if (!\is_string($body)) {
@@ -186,8 +218,8 @@ class Sapient extends Client
     }
 
     /**
-     * Creates a JSON-signed API response to be returned from an API.
-     * Enforces hard-coded Ed25519 keys.
+     * Create an HTTP response object with a JSON body that is encrypted
+     * with the server's public key.
      *
      * @param int $status
      * @param array $arrayToJsonify
@@ -204,6 +236,9 @@ class Sapient extends Client
         array $headers = [],
         string $version = '1.1'
     ): Response {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         /** @var string $body */
         $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
         if (!\is_string($body)) {
@@ -237,6 +272,9 @@ class Sapient extends Client
         SigningSecretKey $key,
         array $headers = []
     ): Request {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         /** @var string $body */
         $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
         if (!\is_string($body)) {
@@ -270,6 +308,9 @@ class Sapient extends Client
         array $headers = [],
         string $version = '1.1'
     ): Response {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         /** @var string $body */
         $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
         if (!\is_string($body)) {
@@ -285,6 +326,8 @@ class Sapient extends Client
     }
 
     /**
+     * Authenticate your HTTP request with a pre-shared key.
+     *
      * @param string $method
      * @param string $uri
      * @param string $body
@@ -314,6 +357,8 @@ class Sapient extends Client
     }
 
     /**
+     * Authenticate your HTTP response with a pre-shared key.
+     *
      * @param int $status
      * @param string $body
      * @param SharedAuthenticationKey $key
@@ -343,6 +388,8 @@ class Sapient extends Client
     }
 
     /**
+     * Encrypt your HTTP request with a pre-shared key.
+     *
      * @param string $method
      * @param string $uri
      * @param string $body
@@ -366,6 +413,8 @@ class Sapient extends Client
     }
 
     /**
+     * Encrypt your HTTP response with a pre-shared key.
+     *
      * @param int $status
      * @param string $body
      * @param SharedEncryptionKey $key
@@ -389,6 +438,9 @@ class Sapient extends Client
     }
 
     /**
+     * Encrypt your HTTP request with the server's public key, so that only
+     * the server can decrypt the message.
+     *
      * @param string $method
      * @param string $uri
      * @param string $body
@@ -416,6 +468,9 @@ class Sapient extends Client
     }
 
     /**
+     * Encrypt your HTTP response with the client's public key, so that only
+     * the client can decrypt the message.
+     *
      * @param int $status
      * @param string $body
      * @param SealingPublicKey $key
@@ -443,6 +498,11 @@ class Sapient extends Client
     }
 
     /**
+     * Ed25519-sign a request body.
+     *
+     * This adds an HTTP header (Body-Signature-Ed25519) which is the base64url
+     * encoded Ed25519 signature of the HTTP request body.
+     *
      * @param string $method
      * @param string $uri
      * @param string $body
@@ -476,7 +536,10 @@ class Sapient extends Client
     }
 
     /**
-     * Ed25519-sign a request body.
+     * Ed25519-sign a response body.
+     *
+     * This adds an HTTP header (Body-Signature-Ed25519) which is the base64url
+     * encoded Ed25519 signature of the HTTP response body.
      *
      * @param int $status
      * @param string $body
@@ -510,6 +573,9 @@ class Sapient extends Client
     }
 
     /**
+     * Verify the Body-Signature-Ed25519 header, and then decode the HTTP
+     * Request body into an array (assuming the body is a valid JSON string).
+     *
      * @param RequestInterface $request
      * @param SigningPublicKey $publicKey
      * @return array
@@ -525,6 +591,9 @@ class Sapient extends Client
     }
 
     /**
+     * Verify the Body-Signature-Ed25519 header, and then return the body as
+     * a string.
+     *
      * @param RequestInterface $request
      * @param SigningPublicKey $publicKey
      * @return string
@@ -538,6 +607,9 @@ class Sapient extends Client
     }
 
     /**
+     * Verify the Body-Signature-Ed25519 header, and then decode the HTTP
+     * Response body into an array (assuming the body is a valid JSON string).
+     *
      * @param ResponseInterface $response
      * @param SigningPublicKey $publicKey
      * @return array
@@ -553,6 +625,9 @@ class Sapient extends Client
     }
 
     /**
+     * Verify the Body-Signature-Ed25519 header, and then return the body as
+     * a string.
+     *
      * @param ResponseInterface $response
      * @param SigningPublicKey $publicKey
      * @return string
@@ -566,6 +641,9 @@ class Sapient extends Client
     }
 
     /**
+     * Decrypt an HTTP request with a pre-shared key, then decode into an
+     * array (assuming the body is a valid JSON string).
+     *
      * @param RequestInterface $request
      * @param SharedEncryptionKey $key
      * @return array
@@ -584,6 +662,9 @@ class Sapient extends Client
         );
     }
     /**
+     * Decrypt an HTTP response with a pre-shared key, then decode into an
+     * array (assuming the body is a valid JSON string).
+     *
      * @param ResponseInterface $response
      * @param SharedEncryptionKey $key
      * @return array
@@ -603,7 +684,7 @@ class Sapient extends Client
     }
 
     /**
-     * Decrypt a message with a shared key.
+     * Decrypt an HTTP request with a pre-shared key.
      *
      * @param RequestInterface $request
      * @param SharedEncryptionKey $key
@@ -622,7 +703,7 @@ class Sapient extends Client
     }
 
     /**
-     * Decrypt a message with a shared key.
+     * Decrypt an HTTP response with a pre-shared key.
      *
      * @param ResponseInterface $response
      * @param SharedEncryptionKey $key
@@ -641,7 +722,7 @@ class Sapient extends Client
     }
 
     /**
-     * Encrypt a message with a shared key.
+     * Encrypt an HTTP request with a pre-shared key.
      *
      * @param RequestInterface $request
      * @param SharedEncryptionKey $key
@@ -660,6 +741,8 @@ class Sapient extends Client
     }
 
     /**
+     * Encrypt an HTTP response with a pre-shared key.
+     *
      * @param ResponseInterface $response
      * @param SharedEncryptionKey $key
      * @return ResponseInterface
@@ -677,6 +760,9 @@ class Sapient extends Client
     }
 
     /**
+     * Decrypt a message with your secret key, that had been encrypted with
+     * your public key by the other endpoint, then decode into an array.
+     *
      * @param RequestInterface $request
      * @param SealingSecretKey $secretKey
      * @return array
@@ -692,6 +778,9 @@ class Sapient extends Client
     }
 
     /**
+     * Decrypt a message with your secret key, that had been encrypted with
+     * your public key by the other endpoint, then decode into an array.
+     *
      * @param ResponseInterface $response
      * @param SealingSecretKey $secretKey
      * @return array
@@ -707,6 +796,9 @@ class Sapient extends Client
     }
 
     /**
+     * Decrypt a message with your secret key, that had been encrypted with
+     * your public key by the other endpoint.
+     *
      * @param RequestInterface $request
      * @param SealingSecretKey $secretKey
      * @return RequestInterface
@@ -728,6 +820,9 @@ class Sapient extends Client
     }
 
     /**
+     * Decrypt a message with your secret key, that had been encrypted with
+     * your public key by the other endpoint.
+     *
      * @param ResponseInterface $response
      * @param SealingSecretKey $secretKey
      * @return ResponseInterface
@@ -749,6 +844,12 @@ class Sapient extends Client
     }
 
     /**
+     * Verifies the signature contained in the Body-Signature-Ed25519 header
+     * is valid for the HTTP Request body provided. Will either return the
+     * request given, or throw an InvalidMessageException if the signature
+     * is invalid. Will also throw a HeaderMissingException is there is no
+     * Body-Signature-Ed25519 header.
+     *
      * @param RequestInterface $request
      * @param SigningPublicKey $publicKey
      * @return RequestInterface
@@ -776,6 +877,12 @@ class Sapient extends Client
     }
     
     /**
+     * Verifies the signature contained in the Body-Signature-Ed25519 header
+     * is valid for the HTTP Response body provided. Will either return the
+     * response given, or throw an InvalidMessageException if the signature
+     * is invalid. Will also throw a HeaderMissingException is there is no
+     * Body-Signature-Ed25519 header.
+     *
      * @param ResponseInterface $response
      * @param SigningPublicKey $publicKey
      * @return ResponseInterface
@@ -804,6 +911,11 @@ class Sapient extends Client
 
 
     /**
+     * Verify that the Body-HMAC-SHA512256 header correctly authenticates the
+     * HTTP Request. Will either return the request given, or throw an
+     * InvalidMessageException if the signature is invalid. Will also throw a
+     * HeaderMissingException is there is no Body-HMAC-SHA512256 header.
+     *
      * @param RequestInterface $request
      * @param SharedAuthenticationKey $key
      * @return RequestInterface
@@ -831,6 +943,11 @@ class Sapient extends Client
     }
 
     /**
+     * Verify that the Body-HMAC-SHA512256 header correctly authenticates the
+     * HTTP Response. Will either return the response given, or throw an
+     * InvalidMessageException if the signature is invalid. Will also throw a
+     * HeaderMissingException is there is no Body-HMAC-SHA512256 header.
+     *
      * @param ResponseInterface $response
      * @param SharedAuthenticationKey $key
      * @return ResponseInterface
