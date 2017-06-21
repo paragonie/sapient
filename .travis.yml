@@ -15,6 +15,6 @@ install:
     - composer update
 
 script:
-    - vendor/bin/phpunit
-    - php -dmbstring.func_overload=7 vendor/bin/phpunit
+    - vendor/bin/phpunit --bootsrap=phpunit-autoload.php
+    - php -dmbstring.func_overload=7 --bootsrap=phpunit-autoload.php vendor/bin/phpunit
     - vendor/bin/psalm
