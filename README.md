@@ -58,9 +58,6 @@ $clientSigningKey = new SigningSecretKey(
     )
 );
 
-// Generate a signing key
-$mySigningKey = SigningSecretKey::generate();
-
 // We use an array to define our message
 $myMessage = [
     'date' => (new DateTime)->format(DateTime::ISO8601),
