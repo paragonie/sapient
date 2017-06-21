@@ -455,9 +455,9 @@ class Sapient extends Client
         SealingPublicKey $key,
         array $headers = []
     ): Request {
-        $sealed = \ParagonIE_Sodium_Compat::crypto_box_seal(
+        $sealed = Simple::seal(
             $body,
-            $key->getString(true)
+            $key
         );
         return new Request(
             $method,
@@ -485,9 +485,9 @@ class Sapient extends Client
         array $headers = [],
         string $version = '1.1'
     ): Response {
-        $sealed = \ParagonIE_Sodium_Compat::crypto_box_seal(
+        $sealed = Simple::seal(
             $body,
-            $key->getString(true)
+            $key
         );
         return new Response(
             $status,
@@ -770,9 +770,9 @@ class Sapient extends Client
         RequestInterface $request,
         SealingPublicKey $publicKey
     ): RequestInterface {
-        $sealed = \ParagonIE_Sodium_Compat::crypto_box_seal(
+        $sealed = Simple::seal(
             (string) $request->getBody(),
-            $publicKey->getString(true)
+            $publicKey
         );
         return $request->withBody(
             stream_for(
@@ -792,9 +792,9 @@ class Sapient extends Client
         ResponseInterface $response,
         SealingPublicKey $publicKey
     ): ResponseInterface {
-        $sealed = \ParagonIE_Sodium_Compat::crypto_box_seal(
+        $sealed = Simple::seal(
             (string) $response->getBody(),
-            $publicKey->getString(true)
+            $publicKey
         );
         return $response->withBody(
             stream_for(
@@ -895,13 +895,10 @@ class Sapient extends Client
         SealingSecretKey $secretKey
     ): RequestInterface {
         $body = Base64UrlSafe::decode((string) $request->getBody());
-        $unsealed = \ParagonIE_Sodium_Compat::crypto_box_seal_open(
+        $unsealed = Simple::unseal(
             $body,
-            $secretKey->getStringForSealOpen()
+            $secretKey
         );
-        if (!\is_string($unsealed)) {
-            throw new InvalidMessageException('Invalid message authentication code');
-        }
         return $request->withBody(stream_for($unsealed));
     }
 
@@ -919,13 +916,10 @@ class Sapient extends Client
         SealingSecretKey $secretKey
     ): ResponseInterface {
         $body = Base64UrlSafe::decode((string) $response->getBody());
-        $unsealed = \ParagonIE_Sodium_Compat::crypto_box_seal_open(
+        $unsealed = Simple::unseal(
             $body,
-            $secretKey->getStringForSealOpen()
+            $secretKey
         );
-        if (!\is_string($unsealed)) {
-            throw new InvalidMessageException('Invalid message authentication code');
-        }
         return $response->withBody(stream_for($unsealed));
     }
 
