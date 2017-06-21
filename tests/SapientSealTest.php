@@ -216,7 +216,7 @@ class SapientSealTest extends TestCase
      * @covers Sapient::createSignedResponse()
      * @covers Sapient::verifySignedResponse()
      */
-    public function testSignedResponse()
+    public function testSealedResponse()
     {
         $randomMessage = Base64UrlSafe::encode(
             \random_bytes(
@@ -258,6 +258,49 @@ class SapientSealTest extends TestCase
             );
             $this->fail('Bad message accepted');
         } catch (\Throwable $ex) {
+        }
+    }
+
+    /**
+     * @covers Sapient::signRequest()
+     * @covers Sapient::signResponse()
+     */
+    public function testPsr7()
+    {
+        $randomMessage = Base64UrlSafe::encode(
+            \random_bytes(
+                \random_int(101, 200)
+            )
+        );
+
+        $request = new Request('POST', '/test', [], $randomMessage);
+        $signedRequest = $this->sapient->sealRequest($request, $this->clientSealPublic);
+        try {
+            $unsealed = $this->sapient->unsealRequest(
+                $signedRequest,
+                $this->clientSealSecret
+            );
+            $this->assertSame(
+                $randomMessage,
+                (string) $unsealed->getBody()
+            );
+        } catch (\Throwable $ex) {
+            $this->fail('Error decrypting message');
+        }
+
+        $response = new Response(200, [], $randomMessage);
+        $signedResponse = $this->sapient->sealResponse($response, $this->clientSealPublic);
+        try {
+            $unsealed = $this->sapient->unsealResponse(
+                $signedResponse,
+                $this->clientSealSecret
+            );
+            $this->assertSame(
+                $randomMessage,
+                (string) $unsealed->getBody()
+            );
+        } catch (\Throwable $ex) {
+            $this->fail('Error decrypting message');
         }
     }
 }

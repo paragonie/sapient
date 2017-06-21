@@ -760,6 +760,50 @@ class Sapient extends Client
     }
 
     /**
+     * Encrypt an HTTP request body with a public key.
+     *
+     * @param RequestInterface $request
+     * @param SealingPublicKey $publicKey
+     * @return RequestInterface
+     */
+    public function sealRequest(
+        RequestInterface $request,
+        SealingPublicKey $publicKey
+    ): RequestInterface {
+        $sealed = \ParagonIE_Sodium_Compat::crypto_box_seal(
+            (string) $request->getBody(),
+            $publicKey->getString(true)
+        );
+        return $request->withBody(
+            stream_for(
+                Base64UrlSafe::encode($sealed)
+            )
+        );
+    }
+
+    /**
+     * Encrypt an HTTP response body with a public key.
+     *
+     * @param ResponseInterface $response
+     * @param SealingPublicKey $publicKey
+     * @return ResponseInterface
+     */
+    public function sealResponse(
+        ResponseInterface $response,
+        SealingPublicKey $publicKey
+    ): ResponseInterface {
+        $sealed = \ParagonIE_Sodium_Compat::crypto_box_seal(
+            (string) $response->getBody(),
+            $publicKey->getString(true)
+        );
+        return $response->withBody(
+            stream_for(
+                Base64UrlSafe::encode($sealed)
+            )
+        );
+    }
+
+    /**
      * Add an Ed25519 signature to an HTTP request object.
      *
      * @param RequestInterface $request
