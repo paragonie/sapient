@@ -760,6 +760,48 @@ class Sapient extends Client
     }
 
     /**
+     * Add an Ed25519 signature to an HTTP request object.
+     *
+     * @param RequestInterface $request
+     * @param SigningSecretKey $secretKey
+     * @return RequestInterface
+     */
+    public function signRequest(
+        RequestInterface $request,
+        SigningSecretKey $secretKey
+    ): RequestInterface {
+        $signature = \ParagonIE_Sodium_Compat::crypto_sign_detached(
+            (string) $request->getBody(),
+            $secretKey->getString(true)
+        );
+        return $request->withAddedHeader(
+            static::HEADER_SIGNATURE_NAME,
+            Base64UrlSafe::encode($signature)
+        );
+    }
+
+    /**
+     * Add an Ed25519 signature to an HTTP response object.
+     *
+     * @param ResponseInterface $response
+     * @param SigningSecretKey $secretKey
+     * @return ResponseInterface
+     */
+    public function signResponse(
+        ResponseInterface $response,
+        SigningSecretKey $secretKey
+    ): ResponseInterface {
+        $signature = \ParagonIE_Sodium_Compat::crypto_sign_detached(
+            (string) $response->getBody(),
+            $secretKey->getString(true)
+        );
+        return $response->withAddedHeader(
+            static::HEADER_SIGNATURE_NAME,
+            Base64UrlSafe::encode($signature)
+        );
+    }
+
+    /**
      * Decrypt a message with your secret key, that had been encrypted with
      * your public key by the other endpoint, then decode into an array.
      *

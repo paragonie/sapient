@@ -9,6 +9,8 @@ use ParagonIE\Sapient\CryptographyKeys\{
     SigningPublicKey,
     SigningSecretKey
 };
+use ParagonIE\Sapient\Exception\HeaderMissingException;
+use ParagonIE\Sapient\Exception\InvalidMessageException;
 use ParagonIE\Sapient\Sapient;
 use PHPUnit\Framework\TestCase;
 
@@ -249,6 +251,59 @@ class SapientSignTest extends TestCase
             );
             $this->fail('Bad message accepted');
         } catch (\Throwable $ex) {
+        }
+    }
+
+    /**
+     * @covers Sapient::signRequest()
+     * @covers Sapient::signResponse()
+     */
+    public function testPsr7()
+    {
+        $randomMessage = Base64UrlSafe::encode(
+            \random_bytes(
+                \random_int(101, 200)
+            )
+        );
+
+        $request = new Request('POST', '/test', [], $randomMessage);
+        $signedRequest = $this->sapient->signRequest($request, $this->clientSignSecret);
+        try {
+            $verified = $this->sapient->verifySignedRequest(
+                $signedRequest,
+                $this->clientSignPublic
+            );
+            $this->assertSame(
+                $randomMessage,
+                (string) $verified->getBody()
+            );
+            $this->assertNotEmpty(
+                $verified->getHeader(Sapient::HEADER_SIGNATURE_NAME)
+            );
+        } catch (HeaderMissingException $exception) {
+            $this->fail('No header added');
+        } catch (InvalidMessageException $exception) {
+            $this->fail('Invalid signature');
+        }
+
+        $response = new Response(200, [], $randomMessage);
+        $signedResponse = $this->sapient->signResponse($response, $this->serverSignSecret);
+        try {
+            $verified = $this->sapient->verifySignedResponse(
+                $signedResponse,
+                $this->serverSignPublic
+            );
+            $this->assertSame(
+                $randomMessage,
+                (string) $verified->getBody()
+            );
+            $this->assertNotEmpty(
+                $verified->getHeader(Sapient::HEADER_SIGNATURE_NAME)
+            );
+        } catch (HeaderMissingException $exception) {
+            $this->fail('No header added');
+        } catch (InvalidMessageException $exception) {
+            $this->fail('Invalid signature');
         }
     }
 }
