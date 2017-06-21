@@ -74,7 +74,7 @@ abstract class Simple
     public static function keyExchange(
         SealingSecretKey $secretKey,
         SealingPublicKey $publicKey,
-        bool $serverSide = false,
+        bool $serverSide,
         int $outputLength = 32
     ): string {
         if ($serverSide) {
@@ -95,6 +95,9 @@ abstract class Simple
     }
 
     /**
+     * Encrypt a message with a public key, so that it can only be decrypted
+     * with the corresponding secret key.
+     *
      * @param string $plaintext
      * @param SealingPublicKey $publicKey
      * @return string
@@ -113,6 +116,10 @@ abstract class Simple
         $ephemeralPublicKey = $ephemeralSecret->getPublickey()->getString(true);
         $sharedKey = \ParagonIE_Sodium_Core_Util::substr($sharedSecret, 0, 32);
         $nonce = \ParagonIE_Sodium_Core_Util::substr($sharedSecret, 32, 24);
+        try {
+            \ParagonIE_Sodium_Compat::memzero($sharedSecret);
+        } catch (\Throwable $ex) {
+        }
 
         return $ephemeralPublicKey. \ParagonIE_Sodium_Compat::crypto_aead_xchacha20poly1305_ietf_encrypt(
             $plaintext,
@@ -123,6 +130,8 @@ abstract class Simple
     }
 
     /**
+     * Decrypt a message with your secret key.
+     *
      * @param string $ciphertext
      * @param SealingSecretKey $secretKey
      * @return string
@@ -142,6 +151,10 @@ abstract class Simple
         );
         $sharedKey = \ParagonIE_Sodium_Core_Util::substr($sharedSecret, 0, 32);
         $nonce = \ParagonIE_Sodium_Core_Util::substr($sharedSecret, 32, 24);
+        try {
+            \ParagonIE_Sodium_Compat::memzero($sharedSecret);
+        } catch (\Throwable $ex) {
+        }
 
         $plaintext = \ParagonIE_Sodium_Compat::crypto_aead_xchacha20poly1305_ietf_decrypt(
             \ParagonIE_Sodium_Core_Util::substr($ciphertext, 32),
