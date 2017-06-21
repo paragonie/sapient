@@ -16,5 +16,5 @@ install:
 
 script:
     - vendor/bin/phpunit --bootstrap=phpunit-autoload.php
-    - php -dmbstring.func_overload=7 --bootstrap=phpunit-autoload.php vendor/bin/phpunit
+    - php -dmbstring.func_overload=7 vendor/bin/phpunit --bootstrap=phpunit-autoload.php
     - vendor/bin/psalm
