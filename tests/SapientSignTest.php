@@ -9,7 +9,6 @@ use ParagonIE\Sapient\CryptographyKeys\{
     SigningPublicKey,
     SigningSecretKey
 };
-use ParagonIE\Sapient\Exception\InvalidMessageException;
 use ParagonIE\Sapient\Sapient;
 use PHPUnit\Framework\TestCase;
 
