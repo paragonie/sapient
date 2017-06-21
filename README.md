@@ -1,5 +1,10 @@
 # Sapient: Secure API toolkit
 
+[![Build Status](https://travis-ci.org/paragonie/sapient.svg?branch=master)](https://travis-ci.org/paragonie/sapient)
+[![Latest Stable Version](https://poser.pugx.org/paragonie/sapient/v/stable)](https://packagist.org/packages/paragonie/sapient)
+[![Latest Unstable Version](https://poser.pugx.org/paragonie/sapient/v/unstable)](https://packagist.org/packages/paragonie/sapient)
+[![License](https://poser.pugx.org/paragonie/sapient/license)](https://packagist.org/packages/paragonie/sapient)
+
 **Sapient** secures your PHP applications' server-to-server HTTP(S) traffic even in the wake of a
 TLS security breakdown (compromised certificate authority, etc.).
 
