@@ -35,10 +35,14 @@ provided by [Guzzle](https://github.com/guzzle/guzzle).
   * Sends/receives signed or encrypted JSON
 * Works with strings
   * i.e. the methods without "Json" in the name
+* Digital signatures and authentication are backwards-compatible
+  with unsigned JSON API clients and servers
+  * The signaure and authentication tag will go into HTTP headers,
+    rather than the request/response body.
 
 ## Example: Mutually Signed JSON API
 
-### Client-Side, Sending a Signed Message
+### Client-Side, Sending a Signed Request, Verifying the Response
 
 ```php
 <?php
@@ -46,6 +50,8 @@ provided by [Guzzle](https://github.com/guzzle/guzzle).
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Sapient;
 use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
+use ParagonIE\Sapient\CryptographyKeys\SigningPublicKey;
+use ParagonIE\Sapient\Exception\InvalidMessageException;
 
 $http = new Sapient([
     'base_uri' => 'https://your-api.example.com'
@@ -56,6 +62,11 @@ $clientSigningKey = new SigningSecretKey(
     Base64UrlSafe::decode(
         'AHxoibWhTylBMgFzJp6GGgYto24PVbQ-ognw9SPnvKppfti72R8By8XnIMTJ8HbDTks7jK5GmAnvtzaj3rbcTA=='
     )
+);
+$serverPublicKey = new SigningPublicKey(
+    Base64UrlSafe::decode(
+        'NvwsINZ-1y0F11xxed_FEUaL_MVewhdgF9tMYf5qEEw='
+    )    
 );
 
 // We use an array to define our message
@@ -75,15 +86,28 @@ $request = $http->createSignedJsonRequest(
 );
 
 $response = $http->send($request);
+try {
+    /** @var array $verifiedResponse */
+    $verifiedResponse = $http->decodeSignedJsonResponse(
+        $response,
+        $serverPublicKey
+    );
+} catch (InvalidMessageException $ex) {
+    \http_response_code(500);
+    exit;
+}
+
 ```
 
-### Server-Side, Verifying a Signed Request
+### Server-Side: Verifying a Signed Request, Signing a Response
 
 ```php
  <?php
- 
+
+use GuzzleHttp\Psr7\ServerRequest;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Sapient;
+use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
 use ParagonIE\Sapient\CryptographyKeys\SigningPublicKey;
 use ParagonIE\Sapient\Exception\InvalidMessageException;
 
@@ -94,8 +118,9 @@ $clientPublicKey = new SigningPublicKey(
         'aX7Yu9kfAcvF5yDEyfB2w05LO4yuRpgJ77c2o9623Ew='
     )
 );
-$request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+$request = ServerRequest::fromGlobals();
 try {
+    /** @var array $decodedRequest */
     $decodedRequest = $http->decodeSignedJsonRequest(
         $request,
         $clientPublicKey
@@ -104,4 +129,29 @@ try {
     \http_response_code(500);
     exit;
 }
+
+/* Business logic goes here */
+
+// Signing a response:
+$serverSignSecret = new SigningSecretKey(
+    Base64UrlSafe::decode(
+        'q6KSHArUnD0sEa-KWpBCYLka805gdA6lVG2mbeM9kq82_Cwg1n7XLQXXXHF538URRov8xV7CF2AX20xh_moQTA=='
+    )
+);
+
+$responseMessage = [
+    'date' => (new DateTime)->format(DateTime::ISO8601),
+    'body' => [
+        'status' => 'OK',
+        'message' => 'We got your message loud and clear.'
+    ]
+];
+
+$response = $http->createSignedJsonResponse(
+    200,
+    $responseMessage,
+    $serverSignSecret
+);
+/* If your framework speaks PSR-7, just return the response object and let it
+   take care of the rest. */
 ```
