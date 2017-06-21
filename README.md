@@ -30,7 +30,7 @@ provided by [Guzzle](https://github.com/guzzle/guzzle).
   * Shared-key authentication
     * HMAC-SHA512-256
   * Anonymous public-key encryption
-    * X25519 + Xsalsa20-Poly1305
+    * X25519 + BLAKE2b + XChaCha20-Poly1305
   * Public-key digital signatures
     * Ed25519
 * Works with arrays
