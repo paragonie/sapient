@@ -17,6 +17,25 @@ The cryptography is provided by [sodium_compat](https://github.com/paragonie/sod
 in turn, will use the libsodium extension in PECL if it's installed). The networking features are
 provided by [Guzzle](https://github.com/guzzle/guzzle).
 
+## Features at a Glance
+
+* Wraps Guzzle, which most PHP developers are already familiar with
+* Works with both `Request` and `Response` objects
+* Secure APIs:
+  * Shared-key encryption
+    * XChaCha20-Poly1305
+  * Shared-key authentication
+    * HMAC-SHA512-256
+  * Anonymous public-key encryption
+    * X25519 + Xsalsa20-Poly1305
+  * Public-key digital signatures
+    * Ed25519
+* Works with arrays
+  * i.e. the methods with "Json" in the name
+  * Sends/receives signed or encrypted JSON
+* Works with strings
+  * i.e. the methods without "Json" in the name
+
 ## Example: Mutually Signed JSON API
 
 ### Client-Side, Sending a Signed Message
