@@ -42,6 +42,9 @@ in turn, will use the libsodium extension in PECL if it's installed).
   * The signaure and authentication tag will go into HTTP headers,
     rather than the request/response body.
 
+Additionally, Sapient is covered by both **unit tests** (provided by [PHPUnit](https://github.com/sebastianbergmann/phpunit)) and
+**automated static analysis** (provided by [Psalm](https://github.com/vimeo/psalm))
+
 ## Example: Mutually Signed JSON API
 
 ### Client-Side, Sending a Signed Request, Verifying the Response
