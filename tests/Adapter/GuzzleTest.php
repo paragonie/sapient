@@ -15,6 +15,7 @@ use ParagonIE\Sapient\CryptographyKeys\{
     SigningSecretKey
 };
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
 
 class GuzzleTest extends TestCase
 {
@@ -73,7 +74,10 @@ class GuzzleTest extends TestCase
     }
 
     /**
-     * @covers Guzzle
+     * @covers Guzzle::createSealedJsonRequest()
+     * @covers Guzzle::createSignedJsonRequest()
+     * @covers Guzzle::createSymmetricAuthenticatedJsonRequest()
+     * @covers Guzzle::createSymmetricEncryptedJsonRequest()
      */
     public function testReturnTypeForCreateRequest()
     {
@@ -97,17 +101,20 @@ class GuzzleTest extends TestCase
 
 
     /**
-     * @covers Guzzle
+     * @covers Guzzle::createSealedJsonResponse()
+     * @covers Guzzle::createSignedJsonResponse()
+     * @covers Guzzle::createSymmetricAuthenticatedJsonResponse()
+     * @covers Guzzle::createSymmetricEncryptedJsonResponse()
      */
     public function testReturnTypeForCreateResponse()
     {
         $this->assertInstanceOf(
             Response::class,
-            $this->adapter->createSignedJsonResponse(200, [], $this->serverSignSecret)
+            $this->adapter->createSealedJsonResponse(200, [], $this->serverSealPublic)
         );
         $this->assertInstanceOf(
             Response::class,
-            $this->adapter->createSealedJsonResponse(200, [], $this->serverSealPublic)
+            $this->adapter->createSignedJsonResponse(200, [], $this->serverSignSecret)
         );
         $this->assertInstanceOf(
             Response::class,
@@ -117,5 +124,13 @@ class GuzzleTest extends TestCase
             Response::class,
             $this->adapter->createSymmetricAuthenticatedJsonResponse(200, [], $this->sharedAuthenticationKey)
         );
+    }
+
+    /**
+     * @covers Guzzle::stringToStream()
+     */
+    public function testStringToStream()
+    {
+        $this->assertInstanceOf(StreamInterface::class, $this->adapter->stringToStream('test'));
     }
 }

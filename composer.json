@@ -4,12 +4,13 @@
   "type": "library",
   "require": {
     "php": "^7",
-    "guzzlehttp/guzzle": "^6",
     "guzzlehttp/psr7": "^1",
     "paragonie/constant_time_encoding": "^2",
-    "paragonie/sodium_compat": "^1"
+    "paragonie/sodium_compat": "^1",
+    "psr/http-message": "^1"
   },
   "require-dev": {
+    "guzzlehttp/guzzle": "^6",
     "phpunit/phpunit": "^6",
     "vimeo/psalm": "dev-master"
   },

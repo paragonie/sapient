@@ -1,8 +1,11 @@
 <?php
 namespace ParagonIE\Sapient\UnitTests;
 
-use ParagonIE\Sapient\CryptographyKeys\SealingSecretKey;
-use ParagonIE\Sapient\CryptographyKeys\SharedEncryptionKey;
+use ParagonIE\Sapient\CryptographyKeys\{
+    SealingPublicKey,
+    SealingSecretKey,
+    SharedEncryptionKey
+};
 use ParagonIE\Sapient\Simple;
 use PHPUnit\Framework\TestCase;
 
@@ -62,6 +65,7 @@ class SimpleTest extends TestCase
     public function testSealUnseal()
     {
         $sealSecret = SealingSecretKey::generate();
+        /** @var SealingPublicKey $sealPublic */
         $sealPublic = $sealSecret->getPublickey();
 
         $messages = [

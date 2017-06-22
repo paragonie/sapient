@@ -13,7 +13,8 @@ use ParagonIE\Sapient\CryptographyKeys\{
 };
 use Psr\Http\Message\{
     RequestInterface,
-    ResponseInterface
+    ResponseInterface,
+    StreamInterface
 };
 
 
@@ -336,4 +337,12 @@ interface AdapterInterface
         array $headers = [],
         string $version = '1.1'
     );
+
+    /**
+     * Adapter-specific way of converting a string into a StreamInterface
+     *
+     * @param string $input
+     * @return StreamInterface
+     */
+    public function stringToStream(string $input): StreamInterface;
 }
