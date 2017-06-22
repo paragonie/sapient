@@ -5,7 +5,6 @@ use ParagonIE\Sapient\CryptographyKeys\{
     SealingPublicKey,
     SealingSecretKey
 };
-use ParagonIE\Sapient\Sapient;
 use PHPUnit\Framework\TestCase;
 
 /**

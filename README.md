@@ -60,7 +60,7 @@ use ParagonIE\Sapient\Exception\InvalidMessageException;
 $http = new Client([
     'base_uri' => 'https://your-api.example.com'
 ]);
-$adapter = new GuzzleAdapter($http);
+$sapient = new Sapient(new GuzzleAdapter($http));
 
 // Keys
 $clientSigningKey = new SigningSecretKey(
@@ -83,7 +83,7 @@ $myMessage = [
 ];
 
 // Create the signed request:
-$request = $adapter->createSignedJsonRequest(
+$request = $sapient->createSignedJsonRequest(
     'POST',
      '/my/api/endpoint',
      $myMessage,
@@ -93,7 +93,7 @@ $request = $adapter->createSignedJsonRequest(
 $response = $http->send($request);
 try {
     /** @var array $verifiedResponse */
-    $verifiedResponse = Sapient::decodeSignedJsonResponse(
+    $verifiedResponse = $sapient->decodeSignedJsonResponse(
         $response,
         $serverPublicKey
     );
@@ -121,7 +121,7 @@ use ParagonIE\Sapient\Exception\InvalidMessageException;
 $http = new Client([
     'base_uri' => 'https://your-api.example.com'
 ]);
-$adapter = new GuzzleAdapter($http);
+$sapient = new Sapient(new GuzzleAdapter($http));
  
 $clientPublicKey = new SigningPublicKey(
     Base64UrlSafe::decode(
@@ -131,7 +131,7 @@ $clientPublicKey = new SigningPublicKey(
 $request = ServerRequest::fromGlobals();
 try {
     /** @var array $decodedRequest */
-    $decodedRequest = Sapient::decodeSignedJsonRequest(
+    $decodedRequest = $sapient->decodeSignedJsonRequest(
         $request,
         $clientPublicKey
     );
@@ -157,7 +157,7 @@ $responseMessage = [
     ]
 ];
 
-$response = $adapter->createSignedJsonResponse(
+$response = $sapient->createSignedJsonResponse(
     200,
     $responseMessage,
     $serverSignSecret

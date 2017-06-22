@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace ParagonIE\Sapient;
 
-use function GuzzleHttp\Psr7\stream_for;
 use ParagonIE\ConstantTime\Base64UrlSafe;
+use ParagonIE\Sapient\Adapter\AdapterInterface;
 use ParagonIE\Sapient\Exception\{
     HeaderMissingException,
     InvalidMessageException
@@ -18,17 +18,52 @@ use ParagonIE\Sapient\CryptographyKeys\{
 };
 use Psr\Http\Message\{
     RequestInterface,
-    ResponseInterface
+    ResponseInterface,
+    StreamInterface
 };
 
 /**
  * Class Sapient
  * @package ParagonIE\Sapient
+ *
+ * These methods are provided by the adapter:
+ * @method RequestInterface createSymmetricAuthenticatedJsonRequest(string $method, string $uri, array $arrayToJsonify, SharedAuthenticationKey $key, array $headers = [])
+ * @method ResponseInterface createSymmetricAuthenticatedJsonResponse(int $status, array $arrayToJsonify, SharedAuthenticationKey $key, array $headers = [], string $version = '1.1')
+ * @method RequestInterface createSymmetricEncryptedJsonRequest(string $method, string $uri, array $arrayToJsonify, SharedEncryptionKey $key, array $headers = [])
+ * @method ResponseInterface createSymmetricEncryptedJsonResponse(int $status, array $arrayToJsonify, SharedEncryptionKey $key, array $headers = [], string $version = '1.1')
+ * @method RequestInterface createSealedJsonRequest(string $method, string $uri, array $arrayToJsonify, SealingPublicKey $key, array $headers = [])
+ * @method ResponseInterface createSealedJsonResponse(int $status, array $arrayToJsonify, SealingPublicKey $key, array $headers = [], string $version = '1.1')
+ * @method RequestInterface createSignedJsonRequest(string $method, string $uri, array $arrayToJsonify, SigningSecretKey $key, array $headers = [])
+ * @method ResponseInterface createSignedJsonResponse(int $status, array $arrayToJsonify, SigningSecretKey $key, array $headers = [], string $version = '1.1')
+ * @method RequestInterface createSymmetricAuthenticatedRequest(string $method, string $uri, string $body, SharedAuthenticationKey $key, array $headers = [])
+ * @method ResponseInterface createSymmetricAuthenticatedResponse(int $status, string $body, SharedAuthenticationKey $key, array $headers = [], string $version = '1.1')
+ * @method RequestInterface createSymmetricEncryptedRequest(string $method, string $uri, string $body, SharedEncryptionKey $key, array $headers = [])
+ * @method ResponseInterface createSymmetricEncryptedResponse(int $status, string $body, SharedEncryptionKey $key, array $headers = [], string $version = '1.1')
+ * @method RequestInterface createSealedRequest(string $method, string $uri, string $body, SealingPublicKey $key, array $headers = [])
+ * @method ResponseInterface createSealedResponse(int $status, string $body, SealingPublicKey $key, array $headers = [], string $version = '1.1')
+ * @method RequestInterface createSignedRequest(string $method, string $uri, string $body, SigningSecretKey $key, array $headers = [])
+ * @method ResponseInterface createSignedResponse(int $status, string $body, SigningSecretKey $key, array $headers = [], string $version = '1.1')
+ * @method StreamInterface stringToStream(string $input)
  */
 class Sapient
 {
     const HEADER_AUTH_NAME = 'Body-HMAC-SHA512256';
     const HEADER_SIGNATURE_NAME = 'Body-Signature-Ed25519';
+
+    /**
+     * @var AdapterInterface
+     */
+    protected $adapter;
+
+    /**
+     * Sapient constructor.
+     *
+     * @param AdapterInterface $adapter
+     */
+    public function __construct(AdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+    }
 
     /**
      * Verify the Body-Signature-Ed25519 header, and then decode the HTTP
@@ -38,12 +73,12 @@ class Sapient
      * @param SigningPublicKey $publicKey
      * @return array
      */
-    public static function decodeSignedJsonRequest(
+    public function decodeSignedJsonRequest(
         RequestInterface $request,
         SigningPublicKey $publicKey
     ): array {
         return \json_decode(
-            static::decodeSignedRequest($request, $publicKey),
+            $this->decodeSignedRequest($request, $publicKey),
             true
         );
     }
@@ -56,11 +91,11 @@ class Sapient
      * @param SigningPublicKey $publicKey
      * @return string
      */
-    public static function decodeSignedRequest(
+    public function decodeSignedRequest(
         RequestInterface $request,
         SigningPublicKey $publicKey
     ): string {
-        $verified = static::verifySignedRequest($request, $publicKey);
+        $verified = $this->verifySignedRequest($request, $publicKey);
         return (string) $verified->getBody();
     }
 
@@ -72,12 +107,12 @@ class Sapient
      * @param SigningPublicKey $publicKey
      * @return array
      */
-    public static function decodeSignedJsonResponse(
+    public function decodeSignedJsonResponse(
         ResponseInterface $response,
         SigningPublicKey $publicKey
     ): array {
         return \json_decode(
-            static::decodeSignedResponse($response, $publicKey),
+            $this->decodeSignedResponse($response, $publicKey),
             true
         );
     }
@@ -90,11 +125,11 @@ class Sapient
      * @param SigningPublicKey $publicKey
      * @return string
      */
-    public static function decodeSignedResponse(
+    public function decodeSignedResponse(
         ResponseInterface $response,
         SigningPublicKey $publicKey
     ): string {
-        $verified = static::verifySignedResponse($response, $publicKey);
+        $verified = $this->verifySignedResponse($response, $publicKey);
         return (string) $verified->getBody();
     }
 
@@ -106,11 +141,11 @@ class Sapient
      * @param SharedEncryptionKey $key
      * @return array
      */
-    public static function decryptJsonRequestWithSharedKey(
+    public function decryptJsonRequestWithSharedKey(
         RequestInterface $request,
         SharedEncryptionKey $key
     ): array {
-        $decrypted = static::decryptRequestWithSharedKey(
+        $decrypted = $this->decryptRequestWithSharedKey(
             $request,
             $key
         );
@@ -127,11 +162,11 @@ class Sapient
      * @param SharedEncryptionKey $key
      * @return array
      */
-    public static function decryptJsonResponseWithSharedKey(
+    public function decryptJsonResponseWithSharedKey(
         ResponseInterface $response,
         SharedEncryptionKey $key
     ): array {
-        $decrypted = static::decryptResponseWithSharedKey(
+        $decrypted = $this->decryptResponseWithSharedKey(
             $response,
             $key
         );
@@ -148,13 +183,13 @@ class Sapient
      * @param SharedEncryptionKey $key
      * @return RequestInterface
      */
-    public static function decryptRequestWithSharedKey(
+    public function decryptRequestWithSharedKey(
         RequestInterface $request,
         SharedEncryptionKey $key
     ): RequestInterface {
         $encrypted = Base64UrlSafe::decode((string) $request->getBody());
         return $request->withBody(
-            stream_for(
+            $this->adapter->stringToStream(
                 Simple::decrypt($encrypted, $key)
             )
         );
@@ -167,13 +202,13 @@ class Sapient
      * @param SharedEncryptionKey $key
      * @return ResponseInterface
      */
-    public static function decryptResponseWithSharedKey(
+    public function decryptResponseWithSharedKey(
         ResponseInterface $response,
         SharedEncryptionKey $key
     ): ResponseInterface {
         $encrypted = Base64UrlSafe::decode((string) $response->getBody());
         return $response->withBody(
-            stream_for(
+            $this->adapter->stringToStream(
                 Simple::decrypt($encrypted, $key)
             )
         );
@@ -186,7 +221,7 @@ class Sapient
      * @param SharedEncryptionKey $key
      * @return RequestInterface
      */
-    public static function encryptRequestWithSharedKey(
+    public function encryptRequestWithSharedKey(
         RequestInterface $request,
         SharedEncryptionKey $key
     ): RequestInterface {
@@ -194,7 +229,7 @@ class Sapient
             Simple::encrypt((string) $request->getBody(), $key)
         );
         return $request->withBody(
-            stream_for($encrypted)
+            $this->adapter->stringToStream($encrypted)
         );
     }
 
@@ -205,7 +240,7 @@ class Sapient
      * @param SharedEncryptionKey $key
      * @return ResponseInterface
      */
-    public static function encryptResponseWithSharedKey(
+    public function encryptResponseWithSharedKey(
         ResponseInterface $response,
         SharedEncryptionKey $key
     ): ResponseInterface {
@@ -213,7 +248,7 @@ class Sapient
             Simple::encrypt((string) $response->getBody(), $key)
         );
         return $response->withBody(
-            stream_for($encrypted)
+            $this->adapter->stringToStream($encrypted)
         );
     }
 
@@ -224,7 +259,7 @@ class Sapient
      * @param SealingPublicKey $publicKey
      * @return RequestInterface
      */
-    public static function sealRequest(
+    public function sealRequest(
         RequestInterface $request,
         SealingPublicKey $publicKey
     ): RequestInterface {
@@ -233,7 +268,7 @@ class Sapient
             $publicKey
         );
         return $request->withBody(
-            stream_for(
+            $this->adapter->stringToStream(
                 Base64UrlSafe::encode($sealed)
             )
         );
@@ -246,7 +281,7 @@ class Sapient
      * @param SealingPublicKey $publicKey
      * @return ResponseInterface
      */
-    public static function sealResponse(
+    public function sealResponse(
         ResponseInterface $response,
         SealingPublicKey $publicKey
     ): ResponseInterface {
@@ -255,7 +290,7 @@ class Sapient
             $publicKey
         );
         return $response->withBody(
-            stream_for(
+            $this->adapter->stringToStream(
                 Base64UrlSafe::encode($sealed)
             )
         );
@@ -268,7 +303,7 @@ class Sapient
      * @param SigningSecretKey $secretKey
      * @return RequestInterface
      */
-    public static function signRequest(
+    public function signRequest(
         RequestInterface $request,
         SigningSecretKey $secretKey
     ): RequestInterface {
@@ -289,7 +324,7 @@ class Sapient
      * @param SigningSecretKey $secretKey
      * @return ResponseInterface
      */
-    public static function signResponse(
+    public function signResponse(
         ResponseInterface $response,
         SigningSecretKey $secretKey
     ): ResponseInterface {
@@ -311,12 +346,12 @@ class Sapient
      * @param SealingSecretKey $secretKey
      * @return array
      */
-    public static function unsealJsonRequest(
+    public function unsealJsonRequest(
         RequestInterface $request,
         SealingSecretKey $secretKey
     ): array {
         return \json_decode(
-            (string) static::unsealRequest($request, $secretKey)->getBody(),
+            (string) $this->unsealRequest($request, $secretKey)->getBody(),
             true
         );
     }
@@ -329,12 +364,12 @@ class Sapient
      * @param SealingSecretKey $secretKey
      * @return array
      */
-    public static function unsealJsonResponse(
+    public function unsealJsonResponse(
         ResponseInterface $response,
         SealingSecretKey $secretKey
     ): array {
         return \json_decode(
-            (string) static::unsealResponse($response, $secretKey)->getBody(),
+            (string) $this->unsealResponse($response, $secretKey)->getBody(),
             true
         );
     }
@@ -348,7 +383,7 @@ class Sapient
      * @return RequestInterface
      * @throws InvalidMessageException
      */
-    public static function unsealRequest(
+    public function unsealRequest(
         RequestInterface $request,
         SealingSecretKey $secretKey
     ): RequestInterface {
@@ -357,7 +392,7 @@ class Sapient
             $body,
             $secretKey
         );
-        return $request->withBody(stream_for($unsealed));
+        return $request->withBody($this->adapter->stringToStream($unsealed));
     }
 
     /**
@@ -369,7 +404,7 @@ class Sapient
      * @return ResponseInterface
      * @throws InvalidMessageException
      */
-    public static function unsealResponse(
+    public function unsealResponse(
         ResponseInterface $response,
         SealingSecretKey $secretKey
     ): ResponseInterface {
@@ -378,7 +413,7 @@ class Sapient
             $body,
             $secretKey
         );
-        return $response->withBody(stream_for($unsealed));
+        return $response->withBody($this->adapter->stringToStream($unsealed));
     }
 
     /**
@@ -394,7 +429,7 @@ class Sapient
      * @throws HeaderMissingException
      * @throws InvalidMessageException
      */
-    public static function verifySignedRequest(
+    public function verifySignedRequest(
         RequestInterface $request,
         SigningPublicKey $publicKey
     ): RequestInterface {
@@ -433,7 +468,7 @@ class Sapient
      * @throws HeaderMissingException
      * @throws InvalidMessageException
      */
-    public static function verifySignedResponse(
+    public function verifySignedResponse(
         ResponseInterface $response,
         SigningPublicKey $publicKey
     ): ResponseInterface {
@@ -470,7 +505,7 @@ class Sapient
      * @throws HeaderMissingException
      * @throws InvalidMessageException
      */
-    public static function verifySymmetricAuthenticatedRequest(
+    public function verifySymmetricAuthenticatedRequest(
         RequestInterface $request,
         SharedAuthenticationKey $key
     ): RequestInterface {
@@ -508,7 +543,7 @@ class Sapient
      * @throws HeaderMissingException
      * @throws InvalidMessageException
      */
-    public static function verifySymmetricAuthenticatedResponse(
+    public function verifySymmetricAuthenticatedResponse(
         ResponseInterface $response,
         SharedAuthenticationKey $key
     ): ResponseInterface {
@@ -535,7 +570,7 @@ class Sapient
     }
 
     /**
-     * Magic method in case this is called in an object context.
+     * Punt adapter methods to the adapter.
      *
      * @param string $name
      * @param array $arguments
@@ -544,9 +579,9 @@ class Sapient
      */
     public function __call($name, $arguments)
     {
-        if (\is_callable([$name, $arguments])) {
-            throw new \Error('Method not found: ' . $name);
+        if (!\method_exists($this->adapter, $name)) {
+            throw new \Error('Could not call method ' . $name);
         }
-        return self::$name(...$arguments);
+        return $this->adapter->$name(...$arguments);
     }
 }

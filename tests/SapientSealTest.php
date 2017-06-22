@@ -1,10 +1,8 @@
 <?php
 namespace ParagonIE\Sapient\UnitTests;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use function GuzzleHttp\Psr7\stream_for;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Adapter\Guzzle;
 use ParagonIE\Sapient\CryptographyKeys\{
@@ -20,7 +18,6 @@ use PHPUnit\Framework\TestCase;
  */
 class SapientSealTest extends TestCase
 {
-
     /** @var Sapient */
     protected $sapient;
 
@@ -41,6 +38,8 @@ class SapientSealTest extends TestCase
      */
     public function setUp()
     {
+        $this->sapient = new Sapient(new Guzzle());
+
         $this->clientSealSecret = SealingSecretKey::generate();
         $this->clientSealPublic = $this->clientSealSecret->getPublickey();
 
@@ -86,7 +85,7 @@ class SapientSealTest extends TestCase
                 $obj,
                 $this->clientSealPublic
             );
-            $decoded = Sapient::unsealJsonRequest(
+            $decoded = $this->sapient->unsealJsonRequest(
                 $request,
                 $this->clientSealSecret
             );
@@ -94,7 +93,7 @@ class SapientSealTest extends TestCase
 
             /* We expect an exception: */
             try {
-                Sapient::unsealJsonRequest(
+                $this->sapient->unsealJsonRequest(
                     $request,
                     $this->serverSealSecret
                 );
@@ -102,12 +101,14 @@ class SapientSealTest extends TestCase
             } catch (\Throwable $ex) {
             }
 
-            $invalid = $request->withBody(stream_for(
-                Base64UrlSafe::encode('invalid message goes here for verifying the failure of crypto_box_seal')
-            ));
+            $invalid = $request->withBody(
+                $this->sapient->stringToStream(
+                    Base64UrlSafe::encode('invalid message goes here for verifying the failure of crypto_box_seal')
+                )
+            );
             /* We expect an exception: */
             try {
-                Sapient::unsealJsonRequest(
+                $this->sapient->unsealJsonRequest(
                     $invalid,
                     $this->clientSealSecret
                 );
@@ -128,14 +129,13 @@ class SapientSealTest extends TestCase
                 \random_int(101, 200)
             )
         );
-        $guzzle = new Guzzle();
-        $request = $guzzle->createSealedRequest(
+        $request = $this->sapient->createSealedRequest(
             'POST',
             '/',
             $randomMessage,
             $this->clientSealPublic
         );
-        $decoded = Sapient::unsealRequest(
+        $decoded = $this->sapient->unsealRequest(
             $request,
             $this->clientSealSecret
         );
@@ -144,7 +144,7 @@ class SapientSealTest extends TestCase
 
         /* Test bad public key */
         try {
-            Sapient::unsealRequest(
+            $this->sapient->unsealRequest(
                 $request,
                 $this->serverSealSecret
             );
@@ -152,13 +152,15 @@ class SapientSealTest extends TestCase
         } catch (\Throwable $ex) {
         }
 
-        $invalid = $request->withBody(stream_for(
-            Base64UrlSafe::encode('invalid message goes here for verifying the failure of crypto_box_seal')
-        ));
+        $invalid = $request->withBody(
+            $this->sapient->stringToStream(
+                Base64UrlSafe::encode('invalid message goes here for verifying the failure of crypto_box_seal')
+            )
+        );
 
         /* Test bad message */
         try {
-            Sapient::unsealRequest(
+            $this->sapient->unsealRequest(
                 $invalid,
                 $this->serverSealSecret
             );
@@ -181,18 +183,18 @@ class SapientSealTest extends TestCase
                 $obj,
                 $this->serverSealPublic
             );
-            $responseRaw = Sapient::unsealResponse(
+            $responseRaw = $this->sapient->unsealResponse(
                 $response,
                 $this->serverSealSecret
             );
             $this->assertInstanceOf(Response::class, $responseRaw);
 
-            $decoded = Sapient::unsealJsonResponse($response, $this->serverSealSecret);
+            $decoded = $this->sapient->unsealJsonResponse($response, $this->serverSealSecret);
             $this->assertSame($obj, $decoded);
 
             /* Test bad public key */
             try {
-                Sapient::unsealResponse(
+                $this->sapient->unsealResponse(
                     $response,
                     $this->clientSealSecret
                 );
@@ -200,12 +202,14 @@ class SapientSealTest extends TestCase
             } catch (\Throwable $ex) {
             }
 
-            $invalid = $response->withBody(stream_for(
-                Base64UrlSafe::encode('invalid message goes here for verifying the failure of crypto_box_seal')
-            ));
+            $invalid = $response->withBody(
+                $this->sapient->stringToStream(
+                    Base64UrlSafe::encode('invalid message goes here for verifying the failure of crypto_box_seal')
+                )
+            );
             /* Test bad message */
             try {
-                Sapient::unsealResponse(
+                $this->sapient->unsealResponse(
                     $invalid,
                     $this->serverSealSecret
                 );
@@ -226,24 +230,23 @@ class SapientSealTest extends TestCase
                 \random_int(101, 200)
             )
         );
-        $guzzle = new Guzzle();
-        $response = $guzzle->createSealedResponse(
+        $response = $this->sapient->createSealedResponse(
             200,
             $randomMessage,
             $this->serverSealPublic
         );
-        $responseRaw = Sapient::unsealResponse(
+        $responseRaw = $this->sapient->unsealResponse(
             $response,
             $this->serverSealSecret
         );
         $this->assertInstanceOf(Response::class, $responseRaw);
 
-        $decoded = Sapient::unsealResponse($response, $this->serverSealSecret);
+        $decoded = $this->sapient->unsealResponse($response, $this->serverSealSecret);
         $this->assertSame($randomMessage, (string) $decoded->getBody());
 
         /* Test bad public key */
         try {
-            Sapient::unsealResponse(
+            $this->sapient->unsealResponse(
                 $response,
                 $this->clientSealSecret
             );
@@ -251,12 +254,14 @@ class SapientSealTest extends TestCase
         } catch (\Throwable $ex) {
         }
 
-        $invalid = $response->withBody(stream_for(
-            Base64UrlSafe::encode('invalid message goes here for verifying the failure of crypto_box_seal')
-        ));
+        $invalid = $response->withBody(
+            $this->sapient->stringToStream(
+                Base64UrlSafe::encode('invalid message goes here for verifying the failure of crypto_box_seal')
+            )
+        );
         /* Test bad message */
         try {
-            Sapient::unsealResponse(
+            $this->sapient->unsealResponse(
                 $invalid,
                 $this->serverSealSecret
             );
@@ -278,9 +283,9 @@ class SapientSealTest extends TestCase
         );
 
         $request = new Request('POST', '/test', [], $randomMessage);
-        $signedRequest = Sapient::sealRequest($request, $this->clientSealPublic);
+        $signedRequest = $this->sapient->sealRequest($request, $this->clientSealPublic);
         try {
-            $unsealed = Sapient::unsealRequest(
+            $unsealed = $this->sapient->unsealRequest(
                 $signedRequest,
                 $this->clientSealSecret
             );
@@ -293,9 +298,9 @@ class SapientSealTest extends TestCase
         }
 
         $response = new Response(200, [], $randomMessage);
-        $signedResponse = Sapient::sealResponse($response, $this->clientSealPublic);
+        $signedResponse = $this->sapient->sealResponse($response, $this->clientSealPublic);
         try {
-            $unsealed = Sapient::unsealResponse(
+            $unsealed = $this->sapient->unsealResponse(
                 $signedResponse,
                 $this->clientSealSecret
             );
