@@ -56,6 +56,10 @@ class GuzzleTest extends TestCase
      */
     public function setup()
     {
+        if (!\class_exists('GuzzleHttp\Client')) {
+            $this->markTestSkipped('Guzzle not included as a dependency.');
+            return;
+        }
         $this->adapter = new Guzzle();
         $this->clientSignSecret = SigningSecretKey::generate();
         $this->clientSignPublic = $this->clientSignSecret->getPublickey();
