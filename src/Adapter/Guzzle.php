@@ -21,7 +21,9 @@ use ParagonIE\Sapient\CryptographyKeys\{
 use ParagonIE\Sapient\Sapient;
 use ParagonIE\Sapient\Simple;
 use Psr\Http\Message\{
-    RequestInterface, ResponseInterface, StreamInterface
+    RequestInterface,
+    ResponseInterface,
+    StreamInterface
 };
 
 /**
