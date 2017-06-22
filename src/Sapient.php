@@ -25,7 +25,7 @@ use Psr\Http\Message\{
  * Class Sapient
  * @package ParagonIE\Sapient
  */
-abstract class Sapient
+class Sapient
 {
     const HEADER_AUTH_NAME = 'Body-HMAC-SHA512256';
     const HEADER_SIGNATURE_NAME = 'Body-Signature-Ed25519';
@@ -532,5 +532,21 @@ abstract class Sapient
             }
         }
         throw new InvalidMessageException('No valid signature given for this HTTP response');
+    }
+
+    /**
+     * Magic method in case this is called in an object context.
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     * @throws \Error
+     */
+    public function __call($name, $arguments)
+    {
+        if (\is_callable([$name, $arguments])) {
+            throw new \Error('Method not found: ' . $name);
+        }
+        return self::$name(...$arguments);
     }
 }
