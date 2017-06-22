@@ -74,7 +74,7 @@ $serverPublicKey = new SigningPublicKey(
 
 // We use an array to define our message
 $myMessage = [
-    'date' => (new DateTime)->format(DateTime::ISO8601),
+    'date' => (new DateTime)->format(DateTime::ATOM),
     'body' => [
         'test' => 'hello world!'        
     ]
@@ -143,7 +143,7 @@ $serverSignSecret = new SigningSecretKey(
 );
 
 $responseMessage = [
-    'date' => (new DateTime)->format(DateTime::ISO8601),
+    'date' => (new DateTime)->format(DateTime::ATOM),
     'body' => [
         'status' => 'OK',
         'message' => 'We got your message loud and clear.'
