@@ -2,9 +2,11 @@
 declare(strict_types=1);
 namespace ParagonIE\Sapient;
 
-use ParagonIE\Sapient\CryptographyKeys\SealingPublicKey;
-use ParagonIE\Sapient\CryptographyKeys\SealingSecretKey;
-use ParagonIE\Sapient\CryptographyKeys\SharedEncryptionKey;
+use ParagonIE\Sapient\CryptographyKeys\{
+    SealingPublicKey,
+    SealingSecretKey,
+    SharedEncryptionKey
+};
 use ParagonIE\Sapient\Exception\InvalidMessageException;
 
 /**

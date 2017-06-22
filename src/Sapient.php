@@ -475,7 +475,9 @@ class Sapient
         /** @var array<int, string> */
         $headers = $response->getHeader(static::HEADER_SIGNATURE_NAME);
         if (!$headers) {
-            throw new HeaderMissingException('No signed response header (' . static::HEADER_SIGNATURE_NAME . ') found.');
+            throw new HeaderMissingException(
+                'No signed response header (' . static::HEADER_SIGNATURE_NAME . ') found.'
+            );
         }
 
         $body = (string) $response->getBody();
