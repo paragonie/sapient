@@ -4,6 +4,7 @@ namespace ParagonIE\Sapient\UnitTests;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use ParagonIE\ConstantTime\Base64UrlSafe;
+use ParagonIE\Sapient\Adapter\Guzzle;
 use ParagonIE\Sapient\CryptographyKeys\{
     SharedAuthenticationKey,
     SharedEncryptionKey
@@ -17,9 +18,6 @@ use PHPUnit\Framework\TestCase;
  */
 class SapientSymmetricTest extends TestCase
 {
-    /** @var Sapient */
-    protected $sapient;
-
     /** @var SharedAuthenticationKey */
     protected $sharedAuthenticationKey;
 
@@ -53,8 +51,6 @@ class SapientSymmetricTest extends TestCase
      */
     public function setUp()
     {
-        $this->sapient = new Sapient();
-
         $this->sharedEncryptionKey = SharedEncryptionKey::generate();
         $this->sharedAuthenticationKey = SharedAuthenticationKey::generate();
     }
@@ -66,20 +62,21 @@ class SapientSymmetricTest extends TestCase
     public function testEncryptDecryptJsonRequest()
     {
         foreach ($this->getSampleObjects() as $obj) {
-            $request = $this->sapient->createSymmetricEncryptedJsonRequest(
+            $guzzle = new Guzzle();
+            $request = $guzzle->createSymmetricEncryptedJsonRequest(
                 'POST',
                 '/test/api-endpoint',
                 $obj,
                 $this->sharedEncryptionKey
             );
-            $decrypted = $this->sapient->decryptJsonRequestWithSharedKey(
+            $decrypted = Sapient::decryptJsonRequestWithSharedKey(
                 $request,
                 $this->sharedEncryptionKey
             );
             $this->assertSame($obj, $decrypted);
 
             try {
-                $this->sapient->decryptJsonRequestWithSharedKey(
+                Sapient::decryptJsonRequestWithSharedKey(
                     $request,
                     SharedEncryptionKey::generate()
                 );
@@ -99,13 +96,14 @@ class SapientSymmetricTest extends TestCase
     {
         $randomMessage = random_bytes(random_int(101, 200));
 
-        $request = $this->sapient->createSymmetricEncryptedRequest(
+        $guzzle = new Guzzle();
+        $request = $guzzle->createSymmetricEncryptedRequest(
             'POST',
             '/test/api-endpoint',
             $randomMessage,
             $this->sharedEncryptionKey
         );
-        $decrypted = $this->sapient->decryptRequestWithSharedKey(
+        $decrypted = Sapient::decryptRequestWithSharedKey(
             $request,
             $this->sharedEncryptionKey
         );
@@ -115,7 +113,7 @@ class SapientSymmetricTest extends TestCase
         $this->assertSame($randomMessage, $decryptedBody);
 
         try {
-            $this->sapient->decryptRequestWithSharedKey(
+            Sapient::decryptRequestWithSharedKey(
                 $request,
                 SharedEncryptionKey::generate()
             );
@@ -132,19 +130,20 @@ class SapientSymmetricTest extends TestCase
     public function testEncryptDecryptJsonResponse()
     {
         foreach ($this->getSampleObjects() as $obj) {
-            $Response = $this->sapient->createSymmetricEncryptedJsonResponse(
+            $guzzle = new Guzzle();
+            $Response = $guzzle->createSymmetricEncryptedJsonResponse(
                 200,
                 $obj,
                 $this->sharedEncryptionKey
             );
-            $decrypted = $this->sapient->decryptJsonResponseWithSharedKey(
+            $decrypted = Sapient::decryptJsonResponseWithSharedKey(
                 $Response,
                 $this->sharedEncryptionKey
             );
             $this->assertSame($obj, $decrypted);
 
             try {
-                $this->sapient->decryptJsonResponseWithSharedKey(
+                Sapient::decryptJsonResponseWithSharedKey(
                     $Response,
                     SharedEncryptionKey::generate()
                 );
@@ -164,13 +163,14 @@ class SapientSymmetricTest extends TestCase
     {
         $randomMessage = random_bytes(random_int(101, 200));
 
-        $Response = $this->sapient->createSymmetricEncryptedResponse(
+        $guzzle = new Guzzle();
+        $response = $guzzle->createSymmetricEncryptedResponse(
             200,
             $randomMessage,
             $this->sharedEncryptionKey
         );
-        $decrypted = $this->sapient->decryptResponseWithSharedKey(
-            $Response,
+        $decrypted = Sapient::decryptResponseWithSharedKey(
+            $response,
             $this->sharedEncryptionKey
         );
         $this->assertInstanceOf(Response::class, $decrypted);
@@ -179,8 +179,8 @@ class SapientSymmetricTest extends TestCase
         $this->assertSame($randomMessage, $decryptedBody);
 
         try {
-            $this->sapient->decryptResponseWithSharedKey(
-                $Response,
+            Sapient::decryptResponseWithSharedKey(
+                $response,
                 SharedEncryptionKey::generate()
             );
             $this->fail('Decryption permitted under invalid key');

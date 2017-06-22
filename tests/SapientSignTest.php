@@ -1,10 +1,12 @@
 <?php
 namespace ParagonIE\Sapient\UnitTests;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use function GuzzleHttp\Psr7\stream_for;
 use ParagonIE\ConstantTime\Base64UrlSafe;
+use ParagonIE\Sapient\Adapter\Guzzle;
 use ParagonIE\Sapient\CryptographyKeys\{
     SigningPublicKey,
     SigningSecretKey
@@ -20,9 +22,6 @@ use PHPUnit\Framework\TestCase;
  */
 class SapientSignTest extends TestCase
 {
-    /** @var Sapient */
-    protected $sapient;
-
     /** @var SigningSecretKey */
     protected $clientSignSecret;
 
@@ -40,8 +39,6 @@ class SapientSignTest extends TestCase
      */
     public function setUp()
     {
-        $this->sapient = new Sapient();
-
         $this->clientSignSecret = SigningSecretKey::generate();
         $this->clientSignPublic = $this->clientSignSecret->getPublickey();
 
@@ -80,23 +77,24 @@ class SapientSignTest extends TestCase
         $sampleObjects = $this->getSampleObjects();
 
         foreach ($sampleObjects as $obj) {
-            $request = $this->sapient->createSignedJsonRequest(
+            $guzzle = new Guzzle();
+            $request = $guzzle->createSignedJsonRequest(
                 'POST',
                 '/',
                 $obj,
                 $this->clientSignSecret
             );
-            $valid = $this->sapient->verifySignedRequest(
+            $valid = Sapient::verifySignedRequest(
                 $request,
                 $this->clientSignPublic
             );
             $this->assertInstanceOf(Request::class, $valid);
-            $decoded = $this->sapient->decodeSignedJsonRequest($request, $this->clientSignPublic);
+            $decoded = Sapient::decodeSignedJsonRequest($request, $this->clientSignPublic);
             $this->assertSame($obj, $decoded);
 
             /* We expect an exception: */
             try {
-                $this->sapient->verifySignedRequest(
+                Sapient::verifySignedRequest(
                     $request,
                     $this->serverSignPublic
                 );
@@ -107,7 +105,7 @@ class SapientSignTest extends TestCase
             $invalid = $request->withBody(stream_for('invalid message'));
             /* We expect an exception: */
             try {
-                $this->sapient->verifySignedRequest(
+                Sapient::verifySignedRequest(
                     $invalid,
                     $this->clientSignPublic
                 );
@@ -128,24 +126,25 @@ class SapientSignTest extends TestCase
                 \random_int(101, 200)
             )
         );
-        $request = $this->sapient->createSignedRequest(
+        $guzzle = new Guzzle();
+        $request = $guzzle->createSignedRequest(
             'POST',
             '/',
             $randomMessage,
             $this->clientSignSecret
         );
-        $valid = $this->sapient->verifySignedRequest(
+        $valid = Sapient::verifySignedRequest(
             $request,
             $this->clientSignPublic
         );
         $this->assertInstanceOf(Request::class, $valid);
 
-        $decoded = $this->sapient->decodeSignedRequest($request, $this->clientSignPublic);
+        $decoded = Sapient::decodeSignedRequest($request, $this->clientSignPublic);
         $this->assertSame($randomMessage, $decoded);
 
         /* Test bad public key */
         try {
-            $this->sapient->verifySignedRequest(
+            Sapient::verifySignedRequest(
                 $request,
                 $this->serverSignPublic
             );
@@ -157,7 +156,7 @@ class SapientSignTest extends TestCase
 
         /* Test bad message */
         try {
-            $this->sapient->verifySignedRequest(
+            Sapient::verifySignedRequest(
                 $invalid,
                 $this->clientSignPublic
             );
@@ -175,20 +174,21 @@ class SapientSignTest extends TestCase
         $sampleObjects = $this->getSampleObjects();
 
         foreach ($sampleObjects as $obj) {
-            $response = $this->sapient->createSignedJsonResponse(
+            $guzzle = new Guzzle();
+            $response = $guzzle->createSignedJsonResponse(
                 200,
                 $obj,
                 $this->serverSignSecret
             );
-            $valid = $this->sapient->verifySignedResponse($response, $this->serverSignPublic);
+            $valid = Sapient::verifySignedResponse($response, $this->serverSignPublic);
             $this->assertInstanceOf(Response::class, $valid);
 
-            $decoded = $this->sapient->decodeSignedJsonResponse($response, $this->serverSignPublic);
+            $decoded = Sapient::decodeSignedJsonResponse($response, $this->serverSignPublic);
             $this->assertSame($obj, $decoded);
 
             /* Test bad public key */
             try {
-                $this->sapient->verifySignedResponse(
+                Sapient::verifySignedResponse(
                     $valid,
                     $this->clientSignPublic
                 );
@@ -199,7 +199,7 @@ class SapientSignTest extends TestCase
             $invalid = $response->withBody(stream_for('invalid message'));
             /* Test bad message */
             try {
-                $this->sapient->verifySignedResponse(
+                Sapient::verifySignedResponse(
                     $invalid,
                     $this->serverSignPublic
                 );
@@ -221,20 +221,21 @@ class SapientSignTest extends TestCase
             )
         );
 
-        $response = $this->sapient->createSignedResponse(
+        $guzzle = new Guzzle();
+        $response = $guzzle->createSignedResponse(
             200,
             $randomMessage,
             $this->serverSignSecret
         );
-        $valid = $this->sapient->verifySignedResponse($response, $this->serverSignPublic);
+        $valid = Sapient::verifySignedResponse($response, $this->serverSignPublic);
         $this->assertInstanceOf(Response::class, $valid);
 
-        $decoded = $this->sapient->decodeSignedResponse($response, $this->serverSignPublic);
+        $decoded = Sapient::decodeSignedResponse($response, $this->serverSignPublic);
         $this->assertSame($randomMessage, $decoded);
 
         /* Test bad public key */
         try {
-            $this->sapient->verifySignedResponse(
+            Sapient::verifySignedResponse(
                 $valid,
                 $this->clientSignPublic
             );
@@ -245,7 +246,7 @@ class SapientSignTest extends TestCase
         $invalid = $response->withBody(stream_for('invalid message'));
         /* Test bad message */
         try {
-            $this->sapient->verifySignedResponse(
+            Sapient::verifySignedResponse(
                 $invalid,
                 $this->serverSignPublic
             );
@@ -267,9 +268,9 @@ class SapientSignTest extends TestCase
         );
 
         $request = new Request('POST', '/test', [], $randomMessage);
-        $signedRequest = $this->sapient->signRequest($request, $this->clientSignSecret);
+        $signedRequest = Sapient::signRequest($request, $this->clientSignSecret);
         try {
-            $verified = $this->sapient->verifySignedRequest(
+            $verified = Sapient::verifySignedRequest(
                 $signedRequest,
                 $this->clientSignPublic
             );
@@ -287,9 +288,9 @@ class SapientSignTest extends TestCase
         }
 
         $response = new Response(200, [], $randomMessage);
-        $signedResponse = $this->sapient->signResponse($response, $this->serverSignSecret);
+        $signedResponse = Sapient::signResponse($response, $this->serverSignSecret);
         try {
-            $verified = $this->sapient->verifySignedResponse(
+            $verified = Sapient::verifySignedResponse(
                 $signedResponse,
                 $this->serverSignPublic
             );

@@ -14,9 +14,6 @@ use PHPUnit\Framework\TestCase;
  */
 class KeyExchangeTest extends TestCase
 {
-    /** @var Sapient */
-    protected $sapient;
-
     /** @var SealingSecretKey */
     protected $clientSealSecret;
 
@@ -34,8 +31,6 @@ class KeyExchangeTest extends TestCase
      */
     public function setUp()
     {
-        $this->sapient = new Sapient();
-
         $this->clientSealSecret = SealingSecretKey::generate();
         $this->clientSealPublic = $this->clientSealSecret->getPublickey();
 

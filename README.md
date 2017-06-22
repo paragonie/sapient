@@ -17,13 +17,12 @@ Sapient allows you to quickly and easily add application-layer cryptography to y
 and responses.
 
 The cryptography is provided by [sodium_compat](https://github.com/paragonie/sodium_compat) (which,
-in turn, will use the libsodium extension in PECL if it's installed). The networking features are
-provided by [Guzzle](https://github.com/guzzle/guzzle).
+in turn, will use the libsodium extension in PECL if it's installed).
 
 ## Features at a Glance
 
-* Wraps Guzzle, which most PHP developers are already familiar with
-* Works with both `Request` and `Response` objects
+* Works with both `Request` and `Response` objects (PSR-7)
+  * Includes a Guzzle adapter for HTTP clients
 * Secure APIs:
   * Shared-key encryption
     * XChaCha20-Poly1305
@@ -50,15 +49,18 @@ provided by [Guzzle](https://github.com/guzzle/guzzle).
 ```php
 <?php
 
+use GuzzleHttp\Client;
 use ParagonIE\ConstantTime\Base64UrlSafe;
+use ParagonIE\Sapient\Adapter\Guzzle as GuzzleAdapter;
 use ParagonIE\Sapient\Sapient;
 use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
 use ParagonIE\Sapient\CryptographyKeys\SigningPublicKey;
 use ParagonIE\Sapient\Exception\InvalidMessageException;
 
-$http = new Sapient([
+$http = new Client([
     'base_uri' => 'https://your-api.example.com'
 ]);
+$adapter = new GuzzleAdapter($http);
 
 // Keys
 $clientSigningKey = new SigningSecretKey(
@@ -81,7 +83,7 @@ $myMessage = [
 ];
 
 // Create the signed request:
-$request = $http->createSignedJsonRequest(
+$request = $adapter->createSignedJsonRequest(
     'POST',
      '/my/api/endpoint',
      $myMessage,
@@ -91,7 +93,7 @@ $request = $http->createSignedJsonRequest(
 $response = $http->send($request);
 try {
     /** @var array $verifiedResponse */
-    $verifiedResponse = $http->decodeSignedJsonResponse(
+    $verifiedResponse = Sapient::decodeSignedJsonResponse(
         $response,
         $serverPublicKey
     );
@@ -107,14 +109,19 @@ try {
 ```php
  <?php
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\ServerRequest;
 use ParagonIE\ConstantTime\Base64UrlSafe;
+use ParagonIE\Sapient\Adapter\Guzzle as GuzzleAdapter;
 use ParagonIE\Sapient\Sapient;
 use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
 use ParagonIE\Sapient\CryptographyKeys\SigningPublicKey;
 use ParagonIE\Sapient\Exception\InvalidMessageException;
 
-$http = new Sapient();
+$http = new Client([
+    'base_uri' => 'https://your-api.example.com'
+]);
+$adapter = new GuzzleAdapter($http);
  
 $clientPublicKey = new SigningPublicKey(
     Base64UrlSafe::decode(
@@ -124,7 +131,7 @@ $clientPublicKey = new SigningPublicKey(
 $request = ServerRequest::fromGlobals();
 try {
     /** @var array $decodedRequest */
-    $decodedRequest = $http->decodeSignedJsonRequest(
+    $decodedRequest = Sapient::decodeSignedJsonRequest(
         $request,
         $clientPublicKey
     );
@@ -150,7 +157,7 @@ $responseMessage = [
     ]
 ];
 
-$response = $http->createSignedJsonResponse(
+$response = $adapter->createSignedJsonResponse(
     200,
     $responseMessage,
     $serverSignSecret

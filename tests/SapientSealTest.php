@@ -1,10 +1,12 @@
 <?php
 namespace ParagonIE\Sapient\UnitTests;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use function GuzzleHttp\Psr7\stream_for;
 use ParagonIE\ConstantTime\Base64UrlSafe;
+use ParagonIE\Sapient\Adapter\Guzzle;
 use ParagonIE\Sapient\CryptographyKeys\{
     SealingPublicKey,
     SealingSecretKey
@@ -39,8 +41,6 @@ class SapientSealTest extends TestCase
      */
     public function setUp()
     {
-        $this->sapient = new Sapient();
-
         $this->clientSealSecret = SealingSecretKey::generate();
         $this->clientSealPublic = $this->clientSealSecret->getPublickey();
 
@@ -79,13 +79,14 @@ class SapientSealTest extends TestCase
         $sampleObjects = $this->getSampleObjects();
 
         foreach ($sampleObjects as $obj) {
-            $request = $this->sapient->createSealedJsonRequest(
+            $guzzle = new Guzzle();
+            $request = $guzzle->createSealedJsonRequest(
                 'POST',
                 '/',
                 $obj,
                 $this->clientSealPublic
             );
-            $decoded = $this->sapient->unsealJsonRequest(
+            $decoded = Sapient::unsealJsonRequest(
                 $request,
                 $this->clientSealSecret
             );
@@ -93,7 +94,7 @@ class SapientSealTest extends TestCase
 
             /* We expect an exception: */
             try {
-                $this->sapient->unsealJsonRequest(
+                Sapient::unsealJsonRequest(
                     $request,
                     $this->serverSealSecret
                 );
@@ -106,7 +107,7 @@ class SapientSealTest extends TestCase
             ));
             /* We expect an exception: */
             try {
-                $this->sapient->unsealJsonRequest(
+                Sapient::unsealJsonRequest(
                     $invalid,
                     $this->clientSealSecret
                 );
@@ -127,13 +128,14 @@ class SapientSealTest extends TestCase
                 \random_int(101, 200)
             )
         );
-        $request = $this->sapient->createSealedRequest(
+        $guzzle = new Guzzle();
+        $request = $guzzle->createSealedRequest(
             'POST',
             '/',
             $randomMessage,
             $this->clientSealPublic
         );
-        $decoded = $this->sapient->unsealRequest(
+        $decoded = Sapient::unsealRequest(
             $request,
             $this->clientSealSecret
         );
@@ -142,7 +144,7 @@ class SapientSealTest extends TestCase
 
         /* Test bad public key */
         try {
-            $this->sapient->unsealRequest(
+            Sapient::unsealRequest(
                 $request,
                 $this->serverSealSecret
             );
@@ -156,7 +158,7 @@ class SapientSealTest extends TestCase
 
         /* Test bad message */
         try {
-            $this->sapient->unsealRequest(
+            Sapient::unsealRequest(
                 $invalid,
                 $this->serverSealSecret
             );
@@ -173,23 +175,24 @@ class SapientSealTest extends TestCase
         $sampleObjects = $this->getSampleObjects();
 
         foreach ($sampleObjects as $obj) {
-            $response = $this->sapient->createSealedJsonResponse(
+            $guzzle = new Guzzle();
+            $response = $guzzle->createSealedJsonResponse(
                 200,
                 $obj,
                 $this->serverSealPublic
             );
-            $responseRaw = $this->sapient->unsealResponse(
+            $responseRaw = Sapient::unsealResponse(
                 $response,
                 $this->serverSealSecret
             );
             $this->assertInstanceOf(Response::class, $responseRaw);
 
-            $decoded = $this->sapient->unsealJsonResponse($response, $this->serverSealSecret);
+            $decoded = Sapient::unsealJsonResponse($response, $this->serverSealSecret);
             $this->assertSame($obj, $decoded);
 
             /* Test bad public key */
             try {
-                $this->sapient->unsealResponse(
+                Sapient::unsealResponse(
                     $response,
                     $this->clientSealSecret
                 );
@@ -202,7 +205,7 @@ class SapientSealTest extends TestCase
             ));
             /* Test bad message */
             try {
-                $this->sapient->unsealResponse(
+                Sapient::unsealResponse(
                     $invalid,
                     $this->serverSealSecret
                 );
@@ -223,23 +226,24 @@ class SapientSealTest extends TestCase
                 \random_int(101, 200)
             )
         );
-        $response = $this->sapient->createSealedResponse(
+        $guzzle = new Guzzle();
+        $response = $guzzle->createSealedResponse(
             200,
             $randomMessage,
             $this->serverSealPublic
         );
-        $responseRaw = $this->sapient->unsealResponse(
+        $responseRaw = Sapient::unsealResponse(
             $response,
             $this->serverSealSecret
         );
         $this->assertInstanceOf(Response::class, $responseRaw);
 
-        $decoded = $this->sapient->unsealResponse($response, $this->serverSealSecret);
+        $decoded = Sapient::unsealResponse($response, $this->serverSealSecret);
         $this->assertSame($randomMessage, (string) $decoded->getBody());
 
         /* Test bad public key */
         try {
-            $this->sapient->unsealResponse(
+            Sapient::unsealResponse(
                 $response,
                 $this->clientSealSecret
             );
@@ -252,7 +256,7 @@ class SapientSealTest extends TestCase
         ));
         /* Test bad message */
         try {
-            $this->sapient->unsealResponse(
+            Sapient::unsealResponse(
                 $invalid,
                 $this->serverSealSecret
             );
@@ -274,9 +278,9 @@ class SapientSealTest extends TestCase
         );
 
         $request = new Request('POST', '/test', [], $randomMessage);
-        $signedRequest = $this->sapient->sealRequest($request, $this->clientSealPublic);
+        $signedRequest = Sapient::sealRequest($request, $this->clientSealPublic);
         try {
-            $unsealed = $this->sapient->unsealRequest(
+            $unsealed = Sapient::unsealRequest(
                 $signedRequest,
                 $this->clientSealSecret
             );
@@ -289,9 +293,9 @@ class SapientSealTest extends TestCase
         }
 
         $response = new Response(200, [], $randomMessage);
-        $signedResponse = $this->sapient->sealResponse($response, $this->clientSealPublic);
+        $signedResponse = Sapient::sealResponse($response, $this->clientSealPublic);
         try {
-            $unsealed = $this->sapient->unsealResponse(
+            $unsealed = Sapient::unsealResponse(
                 $signedResponse,
                 $this->clientSealSecret
             );
