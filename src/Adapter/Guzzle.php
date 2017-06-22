@@ -587,6 +587,16 @@ class Guzzle implements AdapterInterface
     }
 
     /**
+     * This is not part of the AdapterInterface.
+     *
+     * @return Client
+     */
+    public function getGuzzleClient(): Client
+    {
+        return $this->guzzle;
+    }
+
+    /**
      * Adapter-specific way of converting a string into a StreamInterface
      *
      * @param string $input

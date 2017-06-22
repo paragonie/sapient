@@ -253,6 +253,14 @@ class Sapient
     }
 
     /**
+     * @return AdapterInterface
+     */
+    public function getAdapter(): AdapterInterface
+    {
+        return $this->adapter;
+    }
+
+    /**
      * Encrypt an HTTP request body with a public key.
      *
      * @param RequestInterface $request
