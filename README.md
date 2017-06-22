@@ -53,8 +53,8 @@ use GuzzleHttp\Client;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Adapter\Guzzle as GuzzleAdapter;
 use ParagonIE\Sapient\Sapient;
-use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
 use ParagonIE\Sapient\CryptographyKeys\SigningPublicKey;
+use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
 use ParagonIE\Sapient\Exception\InvalidMessageException;
 
 $http = new Client([
@@ -114,8 +114,8 @@ use GuzzleHttp\Psr7\ServerRequest;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Adapter\Guzzle as GuzzleAdapter;
 use ParagonIE\Sapient\Sapient;
-use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
 use ParagonIE\Sapient\CryptographyKeys\SigningPublicKey;
+use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
 use ParagonIE\Sapient\Exception\InvalidMessageException;
 
 $http = new Client([
