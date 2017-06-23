@@ -69,11 +69,7 @@ class Guzzle implements AdapterInterface
         SharedAuthenticationKey $key,
         array $headers = []
     ): RequestInterface {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
@@ -106,11 +102,7 @@ class Guzzle implements AdapterInterface
         array $headers = [],
         string $version = '1.1'
     ): ResponseInterface {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
@@ -142,11 +134,7 @@ class Guzzle implements AdapterInterface
         SharedEncryptionKey $key,
         array $headers = []
     ): RequestInterface {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
@@ -178,11 +166,7 @@ class Guzzle implements AdapterInterface
         array $headers = [],
         string $version = '1.1'
     ): ResponseInterface {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
@@ -214,11 +198,7 @@ class Guzzle implements AdapterInterface
         SealingPublicKey $key,
         array $headers = []
     ): RequestInterface {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
@@ -250,11 +230,7 @@ class Guzzle implements AdapterInterface
         array $headers = [],
         string $version = '1.1'
     ): ResponseInterface {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
@@ -286,11 +262,7 @@ class Guzzle implements AdapterInterface
         SigningSecretKey $key,
         array $headers = []
     ): RequestInterface {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
@@ -322,11 +294,7 @@ class Guzzle implements AdapterInterface
         array $headers = [],
         string $version = '1.1'
     ): ResponseInterface {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
@@ -610,5 +578,22 @@ class Guzzle implements AdapterInterface
             throw new \TypeError('Could not convert string to a stream');
         }
         return $stream;
+    }
+
+    /**
+     * JSON encode body, add Content-Type header.
+     *
+     * @param array $arrayToJsonify
+     * @param array $headers
+     * @return array
+     */
+    protected function makeJSON(array $arrayToJsonify, array $headers): array
+    {
+        if (empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
+        /** @var string $body */
+        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
+        return [$body, $headers];
     }
 }
