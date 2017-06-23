@@ -62,7 +62,7 @@ If you're looking to integrate Sapient into an existing framework, th
 
 ## Example: Mutually Signed JSON API
 
-### Client-Side, Sending a Signed Request, Verifying the Response
+### Client-Side: Sending a Signed Request, Verifying the Response
 
 ```php
 <?php
