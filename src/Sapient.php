@@ -4,6 +4,7 @@ namespace ParagonIE\Sapient;
 
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Adapter\AdapterInterface;
+use ParagonIE\Sapient\Adapter\Generic\Adapter;
 use ParagonIE\Sapient\Exception\{
     HeaderMissingException,
     InvalidMessageException
@@ -60,8 +61,11 @@ class Sapient
      *
      * @param AdapterInterface $adapter
      */
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter = null)
     {
+        if (!$adapter) {
+            $adapter = new Adapter();
+        }
         $this->adapter = $adapter;
     }
 
