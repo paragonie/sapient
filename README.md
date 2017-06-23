@@ -50,6 +50,16 @@ not be considered stable until version 1.0.0 is tagged, signed, and released.
 Additionally, Sapient is covered by both **unit tests** (provided by [PHPUnit](https://github.com/sebastianbergmann/phpunit)) and
 **automated static analysis** (provided by [Psalm](https://github.com/vimeo/psalm))
 
+## Sapient Adapters
+
+If you're looking to integrate Sapient into an existing framework, th
+
+* **Guzzle**
+  * Adapter is included, but Guzzle itself is not a dependency. 
+  * Add the suggested package if you want to use Guzzle (e.g. `composer require guzzlehttp/guzzle:^6`)
+* [Slim Framework Sapient Adapter](https://github.com/paragonie/slim-sapient)
+  * `composer require paragonie/slim-sapient`
+
 ## Example: Mutually Signed JSON API
 
 ### Client-Side, Sending a Signed Request, Verifying the Response
