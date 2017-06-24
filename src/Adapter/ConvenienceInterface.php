@@ -2,13 +2,6 @@
 declare(strict_types=1);
 namespace ParagonIE\Sapient\Adapter;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\{
-    Request,
-    Response
-};
-use function GuzzleHttp\Psr7\stream_for;
-use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Exception\{
     InvalidMessageException
 };
@@ -18,37 +11,17 @@ use ParagonIE\Sapient\CryptographyKeys\{
     SharedEncryptionKey,
     SigningSecretKey
 };
-use ParagonIE\Sapient\Sapient;
-use ParagonIE\Sapient\Simple;
 use Psr\Http\Message\{
     RequestInterface,
-    ResponseInterface,
-    StreamInterface
+    ResponseInterface
 };
 
 /**
- * Class Guzzle
+ * Interface ConvenienceInterface
  * @package ParagonIE\Sapient\Adapter
  */
-class Guzzle implements AdapterInterface, ConvenienceInterface
+interface ConvenienceInterface
 {
-    /**
-     * @var Client
-     */
-    protected $guzzle;
-
-    /**
-     * Guzzle constructor.
-     * @param Client $guzzleClient
-     */
-    public function __construct(Client $guzzleClient = null)
-    {
-        if (!$guzzleClient) {
-            $guzzleClient = new Client();
-        }
-        $this->guzzle = $guzzleClient;
-    }
-
     /**
      * Create an HTTP request object with a JSON body that is authenticated
      * with a pre-shared key. The authentication tag is stored in a
@@ -68,19 +41,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         array $arrayToJsonify,
         SharedAuthenticationKey $key,
         array $headers = []
-    ): RequestInterface {
-        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
-        if (!\is_string($body)) {
-            throw new InvalidMessageException('Cannot JSON-encode this message.');
-        }
-        return $this->createSymmetricAuthenticatedRequest(
-            $method,
-            $uri,
-            $body,
-            $key,
-            $headers
-        );
-    }
+    ): RequestInterface;
 
     /**
      * Create an HTTP response object with a JSON body that is authenticated
@@ -101,19 +62,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SharedAuthenticationKey $key,
         array $headers = [],
         string $version = '1.1'
-    ): ResponseInterface {
-        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
-        if (!\is_string($body)) {
-            throw new InvalidMessageException('Cannot JSON-encode this message.');
-        }
-        return $this->createSymmetricAuthenticatedResponse(
-            $status,
-            $body,
-            $key,
-            $headers,
-            $version
-        );
-    }
+    ): ResponseInterface;
 
     /**
      * Create an HTTP request object with a JSON body that is encrypted
@@ -133,19 +82,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         array $arrayToJsonify,
         SharedEncryptionKey $key,
         array $headers = []
-    ): RequestInterface {
-        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
-        if (!\is_string($body)) {
-            throw new InvalidMessageException('Cannot JSON-encode this message.');
-        }
-        return $this->createSymmetricEncryptedRequest(
-            $method,
-            $uri,
-            $body,
-            $key,
-            $headers
-        );
-    }
+    ): RequestInterface;
 
     /**
      * Create an HTTP response object with a JSON body that is encrypted
@@ -165,19 +102,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SharedEncryptionKey $key,
         array $headers = [],
         string $version = '1.1'
-    ): ResponseInterface {
-        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
-        if (!\is_string($body)) {
-            throw new InvalidMessageException('Cannot JSON-encode this message.');
-        }
-        return $this->createSymmetricEncryptedResponse(
-            $status,
-            $body,
-            $key,
-            $headers,
-            $version
-        );
-    }
+    ): ResponseInterface;
 
     /**
      * Create an HTTP request object with a JSON body that is encrypted
@@ -197,19 +122,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         array $arrayToJsonify,
         SealingPublicKey $key,
         array $headers = []
-    ): RequestInterface {
-        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
-        if (!\is_string($body)) {
-            throw new InvalidMessageException('Cannot JSON-encode this message.');
-        }
-        return $this->createSealedRequest(
-            $method,
-            $uri,
-            $body,
-            $key,
-            $headers
-        );
-    }
+    ): RequestInterface;
 
     /**
      * Create an HTTP response object with a JSON body that is encrypted
@@ -229,19 +142,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SealingPublicKey $key,
         array $headers = [],
         string $version = '1.1'
-    ): ResponseInterface {
-        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
-        if (!\is_string($body)) {
-            throw new InvalidMessageException('Cannot JSON-encode this message.');
-        }
-        return $this->createSealedResponse(
-            $status,
-            $body,
-            $key,
-            $headers,
-            $version
-        );
-    }
+    ): ResponseInterface;
 
     /**
      * Creates a JSON-signed API request to be sent to an API.
@@ -261,19 +162,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         array $arrayToJsonify,
         SigningSecretKey $key,
         array $headers = []
-    ): RequestInterface {
-        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
-        if (!\is_string($body)) {
-            throw new InvalidMessageException('Cannot JSON-encode this message.');
-        }
-        return $this->createSignedRequest(
-            $method,
-            $uri,
-            $body,
-            $key,
-            $headers
-        );
-    }
+    ): RequestInterface;
 
     /**
      * Creates a JSON-signed API response to be returned from an API.
@@ -293,19 +182,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SigningSecretKey $key,
         array $headers = [],
         string $version = '1.1'
-    ): ResponseInterface {
-        list ($body, $headers) = $this->makeJSON($arrayToJsonify, $headers);
-        if (!\is_string($body)) {
-            throw new InvalidMessageException('Cannot JSON-encode this message.');
-        }
-        return $this->createSignedResponse(
-            $status,
-            $body,
-            $key,
-            $headers,
-            $version
-        );
-    }
+    ): ResponseInterface;
 
     /**
      * Authenticate your HTTP request with a pre-shared key.
@@ -323,20 +200,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         string $body,
         SharedAuthenticationKey $key,
         array $headers = []
-    ): RequestInterface {
-        $mac = \ParagonIE_Sodium_Compat::crypto_auth($body, $key->getString(true));
-        if (isset($headers[Sapient::HEADER_SIGNATURE_NAME])) {
-            $headers[Sapient::HEADER_AUTH_NAME][] = Base64UrlSafe::encode($mac);
-        } else {
-            $headers[Sapient::HEADER_AUTH_NAME] = Base64UrlSafe::encode($mac);
-        }
-        return new Request(
-            $method,
-            $uri,
-            $headers,
-            $body
-        );
-    }
+    ): RequestInterface;
 
     /**
      * Authenticate your HTTP response with a pre-shared key.
@@ -354,20 +218,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SharedAuthenticationKey $key,
         array $headers = [],
         string $version = '1.1'
-    ): ResponseInterface {
-        $mac = \ParagonIE_Sodium_Compat::crypto_auth($body, $key->getString(true));
-        if (isset($headers[Sapient::HEADER_SIGNATURE_NAME])) {
-            $headers[Sapient::HEADER_AUTH_NAME][] = Base64UrlSafe::encode($mac);
-        } else {
-            $headers[Sapient::HEADER_AUTH_NAME] = Base64UrlSafe::encode($mac);
-        }
-        return new Response(
-            $status,
-            $headers,
-            $body,
-            $version
-        );
-    }
+    ): ResponseInterface;
 
     /**
      * Encrypt your HTTP request with a pre-shared key.
@@ -385,14 +236,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         string $body,
         SharedEncryptionKey $key,
         array $headers = []
-    ): RequestInterface {
-        return new Request(
-            $method,
-            $uri,
-            $headers,
-            Base64UrlSafe::encode(Simple::encrypt($body, $key))
-        );
-    }
+    ): RequestInterface;
 
     /**
      * Encrypt your HTTP response with a pre-shared key.
@@ -410,14 +254,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SharedEncryptionKey $key,
         array $headers = [],
         string $version = '1.1'
-    ): ResponseInterface {
-        return new Response(
-            $status,
-            $headers,
-            Base64UrlSafe::encode(Simple::encrypt($body, $key)),
-            $version
-        );
-    }
+    ): ResponseInterface;
 
     /**
      * Encrypt your HTTP request with the server's public key, so that only
@@ -436,18 +273,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         string $body,
         SealingPublicKey $key,
         array $headers = []
-    ): RequestInterface {
-        $sealed = Simple::seal(
-            $body,
-            $key
-        );
-        return new Request(
-            $method,
-            $uri,
-            $headers,
-            Base64UrlSafe::encode($sealed)
-        );
-    }
+    ): RequestInterface;
 
     /**
      * Encrypt your HTTP response with the client's public key, so that only
@@ -466,18 +292,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SealingPublicKey $key,
         array $headers = [],
         string $version = '1.1'
-    ): ResponseInterface {
-        $sealed = Simple::seal(
-            $body,
-            $key
-        );
-        return new Response(
-            $status,
-            $headers,
-            Base64UrlSafe::encode($sealed),
-            $version
-        );
-    }
+    ): ResponseInterface;
 
     /**
      * Ed25519-sign a request body.
@@ -498,24 +313,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         string $body,
         SigningSecretKey $key,
         array $headers = []
-    ): RequestInterface {
-        $signature = \ParagonIE_Sodium_Compat::crypto_sign_detached(
-            $body,
-            $key->getString(true)
-        );
-        if (isset($headers[Sapient::HEADER_SIGNATURE_NAME])) {
-            $headers[Sapient::HEADER_SIGNATURE_NAME][] = Base64UrlSafe::encode($signature);
-        } else {
-            $headers[Sapient::HEADER_SIGNATURE_NAME] = Base64UrlSafe::encode($signature);
-        }
-
-        return new Request(
-            $method,
-            $uri,
-            $headers,
-            $body
-        );
-    }
+    ): RequestInterface;
 
     /**
      * Ed25519-sign a response body.
@@ -536,64 +334,5 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SigningSecretKey $key,
         array $headers = [],
         string $version = '1.1'
-    ): ResponseInterface {
-        $signature = \ParagonIE_Sodium_Compat::crypto_sign_detached(
-            $body,
-            $key->getString(true)
-        );
-        if (isset($headers[Sapient::HEADER_SIGNATURE_NAME])) {
-            $headers[Sapient::HEADER_SIGNATURE_NAME][] = Base64UrlSafe::encode($signature);
-        } else {
-            $headers[Sapient::HEADER_SIGNATURE_NAME] = Base64UrlSafe::encode($signature);
-        }
-        return new Response(
-            $status,
-            $headers,
-            $body,
-            $version
-        );
-    }
-
-    /**
-     * This is not part of the AdapterInterface.
-     *
-     * @return Client
-     */
-    public function getGuzzleClient(): Client
-    {
-        return $this->guzzle;
-    }
-
-    /**
-     * Adapter-specific way of converting a string into a StreamInterface
-     *
-     * @param string $input
-     * @return StreamInterface
-     * @throws \TypeError
-     */
-    public function stringToStream(string $input): StreamInterface
-    {
-        $stream = stream_for($input);
-        if (!($stream instanceof StreamInterface)) {
-            throw new \TypeError('Could not convert string to a stream');
-        }
-        return $stream;
-    }
-
-    /**
-     * JSON encode body, add Content-Type header.
-     *
-     * @param array $arrayToJsonify
-     * @param array $headers
-     * @return array
-     */
-    protected function makeJSON(array $arrayToJsonify, array $headers): array
-    {
-        if (empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
-        }
-        /** @var string $body */
-        $body = \json_encode($arrayToJsonify, JSON_PRETTY_PRINT);
-        return [$body, $headers];
-    }
+    );
 }
