@@ -8,16 +8,17 @@
 **Sapient** secures your PHP applications' server-to-server HTTP(S) traffic even in the wake of a
 TLS security breakdown (compromised certificate authority, etc.).
 
+Sapient allows you to quickly and easily add application-layer cryptography to your API requests
+and responses. **Requires PHP 7.**
+
 > See [our blog post about using Sapient to harden your PHP-powered APIs](https://paragonie.com/blog/2017/06/hardening-your-php-powered-apis-with-sapient)
 > for more information about its design rationale and motivation.
 
-Requires PHP 7.
-
-Sapient allows you to quickly and easily add application-layer cryptography to your API requests
-and responses.
-
 The cryptography is provided by [sodium_compat](https://github.com/paragonie/sodium_compat) (which,
 in turn, will use the libsodium extension in PECL if it's installed).
+
+Because sodium_compat operates on strings rather than resources (a.k.a. streams), Sapient is not
+suitable for extremely large messages on systems with very low available memory.
 
 # Version 1.0 has not been released yet.
 
