@@ -37,8 +37,8 @@ $keystream = sodium_crypto_generichash(
     '', // No key
     56
 );
-$key   = substr($keystream,  0, 32);
-$nonce = substr($keystream, 32, 24);
+$key   = mb_substr($keystream,  0, 32, '8bit');
+$nonce = mb_substr($keystream, 32, 24, '8bit');
 ```
 
 That is to say, the derived key will be the first 32 bytes of a 56-byte BLAKE2b hash

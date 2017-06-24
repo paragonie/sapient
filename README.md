@@ -52,7 +52,7 @@ Additionally, Sapient is covered by both **unit tests** (provided by [PHPUnit](h
 
 ## Sapient Adapters
 
-If you're looking to integrate Sapient into an existing framework, th
+If you're looking to integrate Sapient into an existing framework:
 
 * **Guzzle**
   * Adapter is included, but Guzzle itself is not a dependency. 
