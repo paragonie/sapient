@@ -48,6 +48,8 @@ use Psr\Http\Message\{
  */
 class Sapient
 {
+    use JsonSugar;
+
     const HEADER_AUTH_NAME = 'Body-HMAC-SHA512256';
     const HEADER_SIGNATURE_NAME = 'Body-Signature-Ed25519';
 
@@ -70,113 +72,44 @@ class Sapient
     }
 
     /**
-     * Verify the Body-Signature-Ed25519 header, and then decode the HTTP
-     * Request body into an array (assuming the body is a valid JSON string).
+     * Authenticate an HTTP request with a pre-shared key.
      *
      * @param RequestInterface $request
-     * @param SigningPublicKey $publicKey
-     * @return array
+     * @param SharedAuthenticationKey $key
+     * @return RequestInterface
      */
-    public function decodeSignedJsonRequest(
+    public function authenticateRequestWithSharedKey(
         RequestInterface $request,
-        SigningPublicKey $publicKey
-    ): array {
-        return \json_decode(
-            $this->decodeSignedRequest($request, $publicKey),
-            true
+        SharedAuthenticationKey $key
+    ): RequestInterface {
+        $mac = \ParagonIE_Sodium_Compat::crypto_auth(
+            (string) $request->getBody(),
+            $key->getString(true)
+        );
+        return $request->withAddedHeader(
+            self::HEADER_AUTH_NAME,
+            Base64UrlSafe::encode($mac)
         );
     }
 
     /**
-     * Verify the Body-Signature-Ed25519 header, and then return the body as
-     * a string.
-     *
-     * @param RequestInterface $request
-     * @param SigningPublicKey $publicKey
-     * @return string
-     */
-    public function decodeSignedRequest(
-        RequestInterface $request,
-        SigningPublicKey $publicKey
-    ): string {
-        $verified = $this->verifySignedRequest($request, $publicKey);
-        return (string) $verified->getBody();
-    }
-
-    /**
-     * Verify the Body-Signature-Ed25519 header, and then decode the HTTP
-     * Response body into an array (assuming the body is a valid JSON string).
+     * Authenticate an HTTP response with a pre-shared key.
      *
      * @param ResponseInterface $response
-     * @param SigningPublicKey $publicKey
-     * @return array
+     * @param SharedAuthenticationKey $key
+     * @return ResponseInterface
      */
-    public function decodeSignedJsonResponse(
+    public function authenticateResponseWithSharedKey(
         ResponseInterface $response,
-        SigningPublicKey $publicKey
-    ): array {
-        return \json_decode(
-            $this->decodeSignedResponse($response, $publicKey),
-            true
+        SharedAuthenticationKey $key
+    ): ResponseInterface {
+        $mac = \ParagonIE_Sodium_Compat::crypto_auth(
+            (string) $response->getBody(),
+            $key->getString(true)
         );
-    }
-
-    /**
-     * Verify the Body-Signature-Ed25519 header, and then return the body as
-     * a string.
-     *
-     * @param ResponseInterface $response
-     * @param SigningPublicKey $publicKey
-     * @return string
-     */
-    public function decodeSignedResponse(
-        ResponseInterface $response,
-        SigningPublicKey $publicKey
-    ): string {
-        $verified = $this->verifySignedResponse($response, $publicKey);
-        return (string) $verified->getBody();
-    }
-
-    /**
-     * Decrypt an HTTP request with a pre-shared key, then decode into an
-     * array (assuming the body is a valid JSON string).
-     *
-     * @param RequestInterface $request
-     * @param SharedEncryptionKey $key
-     * @return array
-     */
-    public function decryptJsonRequestWithSharedKey(
-        RequestInterface $request,
-        SharedEncryptionKey $key
-    ): array {
-        $decrypted = $this->decryptRequestWithSharedKey(
-            $request,
-            $key
-        );
-        return \json_decode(
-            (string) $decrypted->getBody(),
-            true
-        );
-    }
-    /**
-     * Decrypt an HTTP response with a pre-shared key, then decode into an
-     * array (assuming the body is a valid JSON string).
-     *
-     * @param ResponseInterface $response
-     * @param SharedEncryptionKey $key
-     * @return array
-     */
-    public function decryptJsonResponseWithSharedKey(
-        ResponseInterface $response,
-        SharedEncryptionKey $key
-    ): array {
-        $decrypted = $this->decryptResponseWithSharedKey(
-            $response,
-            $key
-        );
-        return \json_decode(
-            (string) $decrypted->getBody(),
-            true
+        return $response->withAddedHeader(
+            self::HEADER_AUTH_NAME,
+            Base64UrlSafe::encode($mac)
         );
     }
 
@@ -350,41 +283,6 @@ class Sapient
         );
     }
 
-    /**
-     * Decrypt a message with your secret key, that had been encrypted with
-     * your public key by the other endpoint, then decode into an array.
-     *
-     * @param RequestInterface $request
-     * @param SealingSecretKey $secretKey
-     * @return array
-     */
-    public function unsealJsonRequest(
-        RequestInterface $request,
-        SealingSecretKey $secretKey
-    ): array {
-        return \json_decode(
-            (string) $this->unsealRequest($request, $secretKey)->getBody(),
-            true
-        );
-    }
-
-    /**
-     * Decrypt a message with your secret key, that had been encrypted with
-     * your public key by the other endpoint, then decode into an array.
-     *
-     * @param ResponseInterface $response
-     * @param SealingSecretKey $secretKey
-     * @return array
-     */
-    public function unsealJsonResponse(
-        ResponseInterface $response,
-        SealingSecretKey $secretKey
-    ): array {
-        return \json_decode(
-            (string) $this->unsealResponse($response, $secretKey)->getBody(),
-            true
-        );
-    }
 
     /**
      * Decrypt a message with your secret key, that had been encrypted with
