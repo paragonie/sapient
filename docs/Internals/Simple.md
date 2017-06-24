@@ -1,5 +1,7 @@
 # Simple Encryption Abstraction
 
+Canonical name: `ParagonIE\Sapient\Simple`
+
 ## Shared-Key Encryption
 
 Shared-key encryption uses XChaCha20-Poly1305 with a 192-bit random
