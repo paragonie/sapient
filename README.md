@@ -11,6 +11,8 @@ TLS security breakdown (compromised certificate authority, etc.).
 Sapient allows you to quickly and easily add application-layer cryptography to your API requests
 and responses. **Requires PHP 7.**
 
+Sapient was designed and implemented by [the PHP security and cryptography team at Paragon Initiative Enterprises](https://paragonie.com).
+
 > See [our blog post about using Sapient to harden your PHP-powered APIs](https://paragonie.com/blog/2017/06/hardening-your-php-powered-apis-with-sapient)
 > for more information about its design rationale and motivation.
 
