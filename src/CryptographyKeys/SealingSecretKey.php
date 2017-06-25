@@ -78,7 +78,7 @@ class SealingSecretKey extends CryptographyKey
     /**
      * @return SealingPublicKey
      */
-    public function getPublickey(): SealingPublicKey
+    public function getPublicKey(): SealingPublicKey
     {
         return new SealingPublicKey(
             \ParagonIE_Sodium_Compat::crypto_box_publickey_from_secretkey($this->key)

@@ -37,7 +37,7 @@ class SigningSecretKey extends CryptographyKey
     /**
      * @return SigningPublicKey
      */
-    public function getPublickey(): SigningPublicKey
+    public function getPublicKey(): SigningPublicKey
     {
         return new SigningPublicKey(
             \ParagonIE_Sodium_Compat::crypto_sign_publickey_from_secretkey($this->key)
