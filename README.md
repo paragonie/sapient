@@ -19,6 +19,8 @@ in turn, will use the libsodium extension in PECL if it's installed).
 
 Because sodium_compat operates on strings rather than resources (a.k.a. streams), Sapient is not
 suitable for extremely large messages on systems with very low available memory.
+Sapient [only encrypts or authenticates message bodies](https://github.com/paragonie/sapient/blob/master/docs/Internals/Sapient.md#important);
+if you need headers to be encrypted or authenticated, that's the job of Transport-Layer Security (TLS).
 
 ## Features at a Glance
 
