@@ -74,7 +74,6 @@ existing PSR-7 HTTP responses.
 
 ```php
 <?php
-
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Sapient;
 use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
@@ -142,7 +141,6 @@ described in [`ConvenienceInterface`](docs/Internals/Adapter/ConvenienceInterfac
 
 ```php
 <?php
-
 use GuzzleHttp\Client;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Adapter\Guzzle as GuzzleAdapter;
@@ -202,7 +200,6 @@ try {
 
 ```php
  <?php
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\ServerRequest;
 use ParagonIE\ConstantTime\Base64UrlSafe;
