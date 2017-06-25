@@ -125,7 +125,7 @@ trait StringSugar
      * @param SharedAuthenticationKey $key
      * @return string
      */
-    public function verifyAuthenticatedStringRequest(
+    public function verifySymmetricAuthenticatedStringRequest(
         RequestInterface $request,
         SharedAuthenticationKey $key
     ): string {
@@ -141,7 +141,7 @@ trait StringSugar
      * @param SharedAuthenticationKey $key
      * @return string
      */
-    public function verifyAuthenticatedStringResponse(
+    public function verifySymmetricAuthenticatedStringResponse(
         ResponseInterface $response,
         SharedAuthenticationKey $key
     ): string {

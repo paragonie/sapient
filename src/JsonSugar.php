@@ -51,7 +51,7 @@ trait JsonSugar
         SharedAuthenticationKey $key
     ): array {
         return \json_decode(
-            $this->verifyAuthenticatedStringRequest($request, $key),
+            $this->verifySymmetricAuthenticatedStringRequest($request, $key),
             true
         );
     }
@@ -66,7 +66,7 @@ trait JsonSugar
         SharedAuthenticationKey $key
     ): array {
         return \json_decode(
-            $this->verifyAuthenticatedStringResponse($response, $key),
+            $this->verifySymmetricAuthenticatedStringResponse($response, $key),
             true
         );
     }
