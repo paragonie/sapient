@@ -63,6 +63,8 @@ If you're looking to integrate Sapient into an existing framework:
 * [Zend Framework Diactoros Sapient Adapter](https://github.com/paragonie/zend-diactoros-sapient)
   * `composer require paragonie/zend-diactoros-sapient`
 
+To learn more about adapters, see [the documentation for `AdapterInterface`](docs/Internals/Adapter/AdapterInterface.md).
+
 ## Example: Mutually Signed JSON API
 
 ### Client-Side: Sending a Signed Request, Verifying the Response
