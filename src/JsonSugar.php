@@ -164,7 +164,7 @@ trait JsonSugar
         SealingSecretKey $secretKey
     ): array {
         return \json_decode(
-            (string) $this->unsealRequest($request, $secretKey)->getBody(),
+            $this->unsealStringRequest($request, $secretKey),
             true
         );
     }
@@ -182,7 +182,7 @@ trait JsonSugar
         SealingSecretKey $secretKey
     ): array {
         return \json_decode(
-            (string) $this->unsealResponse($response, $secretKey)->getBody(),
+            $this->unsealStringResponse($response, $secretKey),
             true
         );
     }

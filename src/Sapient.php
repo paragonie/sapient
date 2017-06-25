@@ -283,7 +283,6 @@ class Sapient
         );
     }
 
-
     /**
      * Decrypt a message with your secret key, that had been encrypted with
      * your public key by the other endpoint.
