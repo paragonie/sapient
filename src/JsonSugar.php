@@ -39,6 +39,8 @@ use Psr\Http\Message\{
  */
 trait JsonSugar
 {
+    use StringSugar;
+
     /**
      * @param RequestInterface $request
      * @param SharedAuthenticationKey $key
@@ -49,22 +51,9 @@ trait JsonSugar
         SharedAuthenticationKey $key
     ): array {
         return \json_decode(
-            $this->decodeSymmetricAuthenticatedRequest($request, $key),
+            $this->verifyAuthenticatedStringRequest($request, $key),
             true
         );
-    }
-
-    /**
-     * @param RequestInterface $request
-     * @param SharedAuthenticationKey $key
-     * @return string
-     */
-    public function decodeSymmetricAuthenticatedRequest(
-        RequestInterface $request,
-        SharedAuthenticationKey $key
-    ): string {
-        $verified = $this->verifySymmetricAuthenticatedRequest($request, $key);
-        return (string) $verified->getBody();
     }
 
     /**
@@ -77,22 +66,9 @@ trait JsonSugar
         SharedAuthenticationKey $key
     ): array {
         return \json_decode(
-            $this->decodeSymmetricAuthenticatedResponse($response, $key),
+            $this->verifyAuthenticatedStringResponse($response, $key),
             true
         );
-    }
-
-    /**
-     * @param ResponseInterface $response
-     * @param SharedAuthenticationKey $key
-     * @return string
-     */
-    public function decodeSymmetricAuthenticatedResponse(
-        ResponseInterface $response,
-        SharedAuthenticationKey $key
-    ): string {
-        $verified = $this->verifySymmetricAuthenticatedResponse($response, $key);
-        return (string) $verified->getBody();
     }
 
     /**
@@ -108,41 +84,9 @@ trait JsonSugar
         SigningPublicKey $publicKey
     ): array {
         return \json_decode(
-            $this->decodeSignedRequest($request, $publicKey),
+            $this->verifySignedStringRequest($request, $publicKey),
             true
         );
-    }
-
-    /**
-     * Verify the Body-Signature-Ed25519 header, and then return the body as
-     * a string.
-     *
-     * @param RequestInterface $request
-     * @param SigningPublicKey $publicKey
-     * @return string
-     */
-    public function decodeSignedRequest(
-        RequestInterface $request,
-        SigningPublicKey $publicKey
-    ): string {
-        $verified = $this->verifySignedRequest($request, $publicKey);
-        return (string) $verified->getBody();
-    }
-
-    /**
-     * Verify the Body-Signature-Ed25519 header, and then return the body as
-     * a string.
-     *
-     * @param ResponseInterface $response
-     * @param SigningPublicKey $publicKey
-     * @return string
-     */
-    public function decodeSignedResponse(
-        ResponseInterface $response,
-        SigningPublicKey $publicKey
-    ): string {
-        $verified = $this->verifySignedResponse($response, $publicKey);
-        return (string) $verified->getBody();
     }
 
     /**
@@ -158,11 +102,10 @@ trait JsonSugar
         SigningPublicKey $publicKey
     ): array {
         return \json_decode(
-            $this->decodeSignedResponse($response, $publicKey),
+            $this->verifySignedStringResponse($response, $publicKey),
             true
         );
     }
-
 
     /**
      * Decrypt an HTTP request with a pre-shared key, then decode into an
