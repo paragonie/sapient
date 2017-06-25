@@ -128,6 +128,34 @@ of issuing forged headers.
 
 Algorithm: HMAC-SHA512 truncated to 256 bits.
 
+### `verifySymmetricAuthenticatedRequest()` / `verifySymmetricAuthenticatedResponse()`
+
+Function prototypes:
+
+```php
+function verifySymmetricAuthenticatedRequest(
+    RequestInterface $request,
+    SharedAuthenticationKey $key
+): RequestInterface;
+
+function verifySymmetricAuthenticatedResponse(
+    ResponseInterface $response,
+    SharedAuthenticationKey $key
+): ResponseInterface;
+```
+
+These methods verify that the signature contained in the `Body-HMAC-SHA512256` header
+is valid for the body of the HTTP request or response object, given the shared
+authentication key.
+
+If there is no header present, a `HeaderMissingException` is thrown.
+
+If the message authentication code is not valid, an `InvalidMessageException` is thrown.
+
+Otherwise, it returns the object verbatim.
+
+Algorithm: HMAC-SHA-512 truncated to 256 bits
+
 ### `signRequest()` / `signResponse()`
 
 Function prototypes:
@@ -174,7 +202,7 @@ is valid for the body of the HTTP request or response object, given the correct 
 
 If there is no header present, a `HeaderMissingException` is thrown.
 
-If the signature is not  valid, an `InvalidMessageException` is thrown.
+If the signature is not valid, an `InvalidMessageException` is thrown.
 
 Otherwise, it returns the object verbatim.
 
