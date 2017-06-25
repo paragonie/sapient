@@ -65,7 +65,78 @@ If you're looking to integrate Sapient into an existing framework:
 
 To learn more about adapters, see [the documentation for `AdapterInterface`](docs/Internals/Adapter/AdapterInterface.md).
 
-## Example: Mutually Signed JSON API
+## Example 1: Signed PSR-7 Responses
+
+This demonstrats a minimal implementation that adds Ed25519 signatures to your
+existing PSR-7 HTTP responses.
+
+### Server-Side: Signing an HTTP Response
+
+```php
+<?php
+
+use ParagonIE\ConstantTime\Base64UrlSafe;
+use ParagonIE\Sapient\Sapient;
+use ParagonIE\Sapient\CryptographyKeys\SigningSecretKey;
+use Psr\Http\Message\ResponseInterface;
+
+/**
+ * @var ResponseInterface $response
+ *
+ * Let's assume we have a valid ResponseInterface object already.
+ * (Most likely, after doing normal framework things.)  
+ */
+
+$sapient = new Sapient();
+$serverSignSecret = new SigningSecretKey(
+    Base64UrlSafe::decode(
+        'q6KSHArUnD0sEa-KWpBCYLka805gdA6lVG2mbeM9kq82_Cwg1n7XLQXXXHF538URRov8xV7CF2AX20xh_moQTA=='
+    )
+);
+
+$signedResponse = $sapient->signResponse($response, $serverSignSecret);
+```
+
+### Client-Side: Verifying the Signature
+
+```php
+<?php
+use ParagonIE\ConstantTime\Base64UrlSafe;
+use ParagonIE\Sapient\Sapient;
+use ParagonIE\Sapient\CryptographyKeys\SigningPublicKey;
+use ParagonIE\Sapient\Exception\{
+    HeaderMissingException,
+    InvalidMessageException
+};
+use Psr\Http\Message\ResponseInterface;
+
+/**
+ * @var ResponseInterface $response
+ *
+ * Let's assume we have a valid ResponseInterface object already.
+ * (Most likely the result of an HTTP request to the server.)  
+ */
+
+$sapient = new Sapient();
+$serverPublicKey = new SigningPublicKey(
+    Base64UrlSafe::decode(
+        'NvwsINZ-1y0F11xxed_FEUaL_MVewhdgF9tMYf5qEEw='
+    )    
+);
+
+try {
+    $verified = $sapient->verifySignedResponse($response, $serverPublicKey);
+} catch (HeaderMissingException $ex) {
+    /* The server didn't provide a header. Discard and log the error! */
+} catch (InvalidMessageException $ex) {
+    /* Invalid signature for the message. Discard and log the error! */
+}
+```
+
+## Example 2: Mutually Signed JSON API with the Guzzle Adapter
+
+This example takes advantage of an Adapter the provides the convenience methods
+described in [`ConvenienceInterface`](docs/Internals/Adapter/ConvenienceInterface.md).
 
 ### Client-Side: Sending a Signed Request, Verifying the Response
 
