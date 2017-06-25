@@ -18,6 +18,18 @@ function doSomethingWithAResponse(
 ): ResponeInferface;
 ```
 
+## Important
+
+For encryption operations, only the body is encrypted. The HTTP headers are not.
+
+For authentication operations, only the body is authenticated. The HTTP headers
+are not.
+
+If this is unacceptable for your application, you may consider designing a custom
+encapsulation scheme that puts all of the sensitive metadata in the HTTP message
+body and, for encryption operations, sending a generic `Content-Type` header (if
+this is sensitive information).
+
 ### `decryptRequestWithSharedKey()` / `decryptResponseWithSharedKey()` 
 
 Function prototypes:
