@@ -20,11 +20,6 @@ in turn, will use the libsodium extension in PECL if it's installed).
 Because sodium_compat operates on strings rather than resources (a.k.a. streams), Sapient is not
 suitable for extremely large messages on systems with very low available memory.
 
-# Version 1.0 has not been released yet.
-
-If you're not familiar with [Semantic Versioning](http://semver.org/), this means that the API will
-not be considered stable until version 1.0.0 is tagged, signed, and released.
-
 ## Features at a Glance
 
 * Works with both `Request` and `Response` objects (PSR-7)

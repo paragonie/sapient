@@ -2,6 +2,9 @@
 
 To get started using Sapient, see [the tutorial](Tutorial.md).
 
+To learn more about building a Sapient-compatible library in another language, read
+the [Sapient specification](Specification.md).
+
 To learn more about each class, read through the [Internals](Internals) documentation:
 
 * [Cryptography Keys](Internals/CryptographyKey.md)
