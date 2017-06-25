@@ -142,7 +142,7 @@ class SapientSignTest extends TestCase
         );
         $this->assertInstanceOf(Request::class, $valid);
 
-        $decoded = $this->sapient->decodeSignedRequest($request, $this->clientSignPublic);
+        $decoded = $this->sapient->verifySignedStringRequest($request, $this->clientSignPublic);
         $this->assertSame($randomMessage, $decoded);
 
         /* Test bad public key */
@@ -232,7 +232,7 @@ class SapientSignTest extends TestCase
         $valid = $this->sapient->verifySignedResponse($response, $this->serverSignPublic);
         $this->assertInstanceOf(Response::class, $valid);
 
-        $decoded = $this->sapient->decodeSignedResponse($response, $this->serverSignPublic);
+        $decoded = $this->sapient->verifySignedStringResponse($response, $this->serverSignPublic);
         $this->assertSame($randomMessage, $decoded);
 
         /* Test bad public key */
