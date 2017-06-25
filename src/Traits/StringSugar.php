@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ParagonIE\Sapient;
+namespace ParagonIE\Sapient\Traits;
 
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\CryptographyKeys\{
@@ -17,6 +17,7 @@ use Psr\Http\Message\{
     RequestInterface,
     ResponseInterface
 };
+use ParagonIE\Sapient\Simple;
 
 /**
  * Trait StringSugar

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ParagonIE\Sapient;
+namespace ParagonIE\Sapient\Traits;
 
 use ParagonIE\Sapient\CryptographyKeys\{
     SealingPublicKey,

@@ -210,7 +210,7 @@ Algorithm: Ed25519
 
 ## JSON API Methods
 
-See [the JSON Sugar Trait](JsonSugar.md) for the JSON API helper methods.
+See [the JSON Sugar Trait](Traits/JsonSugar.md) for the JSON API helper methods.
 
 ## Adapter Methods
 

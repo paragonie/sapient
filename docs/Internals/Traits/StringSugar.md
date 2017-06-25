@@ -28,7 +28,7 @@ function decryptStringResponseWithSharedKey(
 ): string;
 ```
 
-Similar to [the shared-key decryption methods in `Sapient`](Sapient.md#decryptrequestwithsharedkey--decryptresponsewithsharedkey),
+Similar to [the shared-key decryption methods in `Sapient`](../Sapient.md#decryptrequestwithsharedkey--decryptresponsewithsharedkey),
 except they return a `string` rather than a `RequestInterface` or `ResponseInterface`.
 
 ### `unsealStringRequest()` / `unsealStringResponse()`
@@ -47,7 +47,7 @@ function unsealStringResponse(
 ): string;
 ```
 
-Similar to [the unsealing methods in `Sapient`](Sapient.md#unsealrequest--unsealresponse),
+Similar to [the unsealing methods in `Sapient`](../Sapient.md#unsealrequest--unsealresponse),
 except they return a `string` rather than a `RequestInterface` or `ResponseInterface`.
 
 ### `verifyAuthenticatedStringRequest()` / `verifyAuthenticatedStringResponse()`
@@ -66,7 +66,7 @@ function verifyAuthenticatedStringResponse(
 ): string;
 ```
 
-Similar to the [shared-key auth verification methods in `Sapient`](Sapient.md#verifysymmetricauthenticatedrequest--verifysymmetricauthenticatedresponse),
+Similar to the [shared-key auth verification methods in `Sapient`](../Sapient.md#verifysymmetricauthenticatedrequest--verifysymmetricauthenticatedresponse),
 except they return a `string` rather than a `RequestInterface` or `ResponseInterface`.
 
 
@@ -86,5 +86,5 @@ function verifySignedStringResponse(
  ): string;
 ```
 
-Similar to the [signature verification methods in `Sapient`](Sapient.md#verifysignedrequest--verifysignedresponse),
+Similar to the [signature verification methods in `Sapient`](../Sapient.md#verifysignedrequest--verifysignedresponse),
 except they return a `string` rather than a `RequestInterface` or `ResponseInterface`.

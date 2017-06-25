@@ -17,6 +17,7 @@ use ParagonIE\Sapient\CryptographyKeys\{
     SigningPublicKey,
     SigningSecretKey
 };
+use ParagonIE\Sapient\Traits\JsonSugar;
 use Psr\Http\Message\{
     RequestInterface,
     ResponseInterface,
