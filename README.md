@@ -122,7 +122,7 @@ $sapient = new Sapient();
 $serverPublicKey = new SigningPublicKey(
     Base64UrlSafe::decode(
         'NvwsINZ-1y0F11xxed_FEUaL_MVewhdgF9tMYf5qEEw='
-    )    
+    )
 );
 
 try {
@@ -165,7 +165,7 @@ $clientSigningKey = new SigningSecretKey(
 $serverPublicKey = new SigningPublicKey(
     Base64UrlSafe::decode(
         'NvwsINZ-1y0F11xxed_FEUaL_MVewhdgF9tMYf5qEEw='
-    )    
+    )
 );
 
 // We use an array to define our message
