@@ -71,7 +71,7 @@ The process for encrypting a message with a recipient's public key (`recipPublic
 as follows:
 
 1. Generate an ephemeral X25519 keypair (`ephSecret`, `ephPublic`)
-2. Calculate `X22519(ephSecret, recipPublic)`
+2. Calculate `X25519(ephSecret, recipPublic)`
 3. Calculate `BLAKE2b-448(stepTwo || ephPublic || recipPublic)`
 4. The first 32 bytes of the output of Step 3 is the key.
 5. The remaining 24 bytes of the output of Step 3 is the nonce.
@@ -81,7 +81,7 @@ as follows:
 The process for decrypting a sealed message is as follows:
 
 1. Separate the `ephPublicKey` from the rest of the ciphertext. 
-2. Calculate `X22519(recipSecret, ephPublic)`
+2. Calculate `X25519(recipSecret, ephPublic)`
 3. Calculate `BLAKE2b-448(stepTwo || ephPublic || recipPublic)`
 4. The first 32 bytes of the output of Step 3 is the key.
 5. The remaining 24 bytes of the output of Step 3 is the nonce.
