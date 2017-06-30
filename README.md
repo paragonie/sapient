@@ -57,6 +57,8 @@ If you're looking to integrate Sapient into an existing framework:
 * **Guzzle**
   * Adapter is included, but Guzzle itself is not a dependency. 
   * Add the suggested package if you want to use Guzzle (e.g. `composer require guzzlehttp/guzzle:^6`)
+* [Laravel Sapient Adapter](https://github.com/mcordingley/LaravelSapient)
+  * `composer require mcordingley/laravel-sapient`
 * [Slim Framework Sapient Adapter](https://github.com/paragonie/slim-sapient)
   * `composer require paragonie/slim-sapient`
 * [Zend Framework Diactoros Sapient Adapter](https://github.com/paragonie/zend-diactoros-sapient)
