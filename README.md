@@ -63,6 +63,8 @@ If you're looking to integrate Sapient into an existing framework:
   * `composer require paragonie/slim-sapient`
 * [Zend Framework Diactoros Sapient Adapter](https://github.com/paragonie/zend-diactoros-sapient)
   * `composer require paragonie/zend-diactoros-sapient`
+* [Symfony bundle](https://github.com/lepiaf/sapient-bundle)
+  * `composer require lepiaf/sapient-bundle`
 
 If your framework correctly implements PSR-7, you most likely do not need an adapter. However,
 some adapters provide convenience methods that make rapid development easier.
