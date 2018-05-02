@@ -84,6 +84,8 @@ class SapientSymmetricTest extends TestCase
                     SharedEncryptionKey::generate()
                 );
                 $this->fail('Decryption permitted under invalid key');
+            } catch (\SodiumException $ex) {
+                // Expected outcome
             } catch (\Error $ex) {
                 // Expected outcome
             }
@@ -121,6 +123,8 @@ class SapientSymmetricTest extends TestCase
                 SharedEncryptionKey::generate()
             );
             $this->fail('Decryption permitted under invalid key');
+        } catch (\SodiumException $ex) {
+            // Expected outcome
         } catch (\Error $ex) {
             // Expected outcome
         }
@@ -151,6 +155,8 @@ class SapientSymmetricTest extends TestCase
                     SharedEncryptionKey::generate()
                 );
                 $this->fail('Decryption permitted under invalid key');
+            } catch (\SodiumException $ex) {
+                // Expected outcome
             } catch (\Error $ex) {
                 // Expected outcome
             }
@@ -187,6 +193,8 @@ class SapientSymmetricTest extends TestCase
                 SharedEncryptionKey::generate()
             );
             $this->fail('Decryption permitted under invalid key');
+        } catch (\SodiumException $ex) {
+            // Expected outcome
         } catch (\Error $ex) {
             // Expected outcome
         }
