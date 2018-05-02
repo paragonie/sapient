@@ -73,6 +73,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
+        /** @var array $headers */
         return $this->createSymmetricAuthenticatedRequest(
             $method,
             $uri,
@@ -106,6 +107,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
+        /** @var array $headers */
         return $this->createSymmetricAuthenticatedResponse(
             $status,
             $body,
@@ -138,6 +140,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
+        /** @var array $headers */
         return $this->createSymmetricEncryptedRequest(
             $method,
             $uri,
@@ -170,6 +173,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
+        /** @var array $headers */
         return $this->createSymmetricEncryptedResponse(
             $status,
             $body,
@@ -202,6 +206,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
+        /** @var array $headers */
         return $this->createSealedRequest(
             $method,
             $uri,
@@ -234,6 +239,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
+        /** @var array $headers */
         return $this->createSealedResponse(
             $status,
             $body,
@@ -266,6 +272,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
+        /** @var array $headers */
         return $this->createSignedRequest(
             $method,
             $uri,
@@ -298,6 +305,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         if (!\is_string($body)) {
             throw new InvalidMessageException('Cannot JSON-encode this message.');
         }
+        /** @var array $headers */
         return $this->createSignedResponse(
             $status,
             $body,
@@ -324,6 +332,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SharedAuthenticationKey $key,
         array $headers = []
     ): RequestInterface {
+        /** @var array<string, array<int|string, string>> $headers */
         $mac = \ParagonIE_Sodium_Compat::crypto_auth($body, $key->getString(true));
         if (isset($headers[Sapient::HEADER_SIGNATURE_NAME])) {
             $headers[Sapient::HEADER_AUTH_NAME][] = Base64UrlSafe::encode($mac);
@@ -355,6 +364,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         array $headers = [],
         string $version = '1.1'
     ): ResponseInterface {
+        /** @var array<string, array> $headers */
         $mac = \ParagonIE_Sodium_Compat::crypto_auth($body, $key->getString(true));
         if (isset($headers[Sapient::HEADER_SIGNATURE_NAME])) {
             $headers[Sapient::HEADER_AUTH_NAME][] = Base64UrlSafe::encode($mac);
@@ -499,6 +509,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         SigningSecretKey $key,
         array $headers = []
     ): RequestInterface {
+        /** @var array<string, array<int|string, string>> $headers */
         $signature = \ParagonIE_Sodium_Compat::crypto_sign_detached(
             $body,
             $key->getString(true)
@@ -537,6 +548,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
         array $headers = [],
         string $version = '1.1'
     ): ResponseInterface {
+        /** @var array<string, array<int|string, string>> $headers */
         $signature = \ParagonIE_Sodium_Compat::crypto_sign_detached(
             $body,
             $key->getString(true)
@@ -573,6 +585,7 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
      */
     public function stringToStream(string $input): StreamInterface
     {
+        /** @var StreamInterface|null $stream */
         $stream = stream_for($input);
         if (!($stream instanceof StreamInterface)) {
             throw new \TypeError('Could not convert string to a stream');

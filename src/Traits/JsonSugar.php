@@ -11,6 +11,7 @@ use ParagonIE\Sapient\CryptographyKeys\{
     SigningPublicKey,
     SigningSecretKey
 };
+use ParagonIE\Sapient\Exception\InvalidMessageException;
 use Psr\Http\Message\{
     RequestInterface,
     ResponseInterface
@@ -44,31 +45,45 @@ trait JsonSugar
     /**
      * @param RequestInterface $request
      * @param SharedAuthenticationKey $key
+     *
      * @return array
+     * @throws InvalidMessageException
      */
     public function decodeSymmetricAuthenticatedJsonRequest(
         RequestInterface $request,
         SharedAuthenticationKey $key
     ): array {
-        return \json_decode(
+        /** @var array|bool $array */
+        $array = \json_decode(
             $this->verifySymmetricAuthenticatedStringRequest($request, $key),
             true
         );
+        if (!\is_array($array)) {
+            throw new InvalidMessageException('Could not decode JSON');
+        }
+        return $array;
     }
 
     /**
      * @param ResponseInterface $response
      * @param SharedAuthenticationKey $key
+     *
      * @return array
+     * @throws InvalidMessageException
      */
     public function decodeSymmetricAuthenticatedJsonResponse(
         ResponseInterface $response,
         SharedAuthenticationKey $key
     ): array {
-        return \json_decode(
+        /** @var array|bool $array */
+        $array = \json_decode(
             $this->verifySymmetricAuthenticatedStringResponse($response, $key),
             true
         );
+        if (!\is_array($array)) {
+            throw new InvalidMessageException('Could not decode JSON');
+        }
+        return $array;
     }
 
     /**
@@ -78,15 +93,21 @@ trait JsonSugar
      * @param RequestInterface $request
      * @param SigningPublicKey $publicKey
      * @return array
+     * @throws InvalidMessageException
      */
     public function decodeSignedJsonRequest(
         RequestInterface $request,
         SigningPublicKey $publicKey
     ): array {
-        return \json_decode(
+        /** @var array|bool $array */
+        $array = \json_decode(
             $this->verifySignedStringRequest($request, $publicKey),
             true
         );
+        if (!\is_array($array)) {
+            throw new InvalidMessageException('Could not decode JSON');
+        }
+        return $array;
     }
 
     /**
@@ -95,16 +116,23 @@ trait JsonSugar
      *
      * @param ResponseInterface $response
      * @param SigningPublicKey $publicKey
+     *
      * @return array
+     * @throws InvalidMessageException
      */
     public function decodeSignedJsonResponse(
         ResponseInterface $response,
         SigningPublicKey $publicKey
     ): array {
-        return \json_decode(
+        /** @var array|bool $array */
+        $array = \json_decode(
             $this->verifySignedStringResponse($response, $publicKey),
             true
         );
+        if (!\is_array($array)) {
+            throw new InvalidMessageException('Could not decode JSON');
+        }
+        return $array;
     }
 
     /**
@@ -113,7 +141,9 @@ trait JsonSugar
      *
      * @param RequestInterface $request
      * @param SharedEncryptionKey $key
+     *
      * @return array
+     * @throws InvalidMessageException
      */
     public function decryptJsonRequestWithSharedKey(
         RequestInterface $request,
@@ -123,10 +153,16 @@ trait JsonSugar
             $request,
             $key
         );
-        return \json_decode(
+
+        /** @var array|bool $array */
+        $array = \json_decode(
             (string) $decrypted->getBody(),
             true
         );
+        if (!\is_array($array)) {
+            throw new InvalidMessageException('Could not decode JSON');
+        }
+        return $array;
     }
 
     /**
@@ -135,7 +171,9 @@ trait JsonSugar
      *
      * @param ResponseInterface $response
      * @param SharedEncryptionKey $key
+     *
      * @return array
+     * @throws InvalidMessageException
      */
     public function decryptJsonResponseWithSharedKey(
         ResponseInterface $response,
@@ -145,10 +183,16 @@ trait JsonSugar
             $response,
             $key
         );
-        return \json_decode(
+
+        /** @var array|bool $array */
+        $array = \json_decode(
             (string) $decrypted->getBody(),
             true
         );
+        if (!\is_array($array)) {
+            throw new InvalidMessageException('Could not decode JSON');
+        }
+        return $array;
     }
 
     /**
@@ -163,10 +207,15 @@ trait JsonSugar
         RequestInterface $request,
         SealingSecretKey $secretKey
     ): array {
-        return \json_decode(
+        /** @var array|bool $array */
+        $array = \json_decode(
             $this->unsealStringRequest($request, $secretKey),
             true
         );
+        if (!\is_array($array)) {
+            throw new InvalidMessageException('Could not decode JSON');
+        }
+        return $array;
     }
 
     /**
@@ -176,14 +225,20 @@ trait JsonSugar
      * @param ResponseInterface $response
      * @param SealingSecretKey $secretKey
      * @return array
+     * @throws InvalidMessageException
      */
     public function unsealJsonResponse(
         ResponseInterface $response,
         SealingSecretKey $secretKey
     ): array {
-        return \json_decode(
+        /** @var array|bool $array */
+        $array = \json_decode(
             $this->unsealStringResponse($response, $secretKey),
             true
         );
+        if (!\is_array($array)) {
+            throw new InvalidMessageException('Could not decode JSON');
+        }
+        return $array;
     }
 }

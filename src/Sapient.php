@@ -258,7 +258,7 @@ class Sapient
             $secretKey->getString(true)
         );
         return $request->withAddedHeader(
-            static::HEADER_SIGNATURE_NAME,
+            (string) static::HEADER_SIGNATURE_NAME,
             Base64UrlSafe::encode($signature)
         );
     }
@@ -279,7 +279,7 @@ class Sapient
             $secretKey->getString(true)
         );
         return $response->withAddedHeader(
-            static::HEADER_SIGNATURE_NAME,
+            (string) static::HEADER_SIGNATURE_NAME,
             Base64UrlSafe::encode($signature)
         );
     }
@@ -344,10 +344,10 @@ class Sapient
         SigningPublicKey $publicKey
     ): RequestInterface {
         /** @var array<int, string> */
-        $headers = $request->getHeader(static::HEADER_SIGNATURE_NAME);
+        $headers = $request->getHeader((string) static::HEADER_SIGNATURE_NAME);
         if (!$headers) {
             throw new HeaderMissingException(
-                'No signed request header (' . static::HEADER_SIGNATURE_NAME . ') found.'
+                'No signed request header (' . (string) static::HEADER_SIGNATURE_NAME . ') found.'
             );
         }
 
@@ -383,10 +383,10 @@ class Sapient
         SigningPublicKey $publicKey
     ): ResponseInterface {
         /** @var array<int, string> */
-        $headers = $response->getHeader(static::HEADER_SIGNATURE_NAME);
+        $headers = $response->getHeader((string) static::HEADER_SIGNATURE_NAME);
         if (!$headers) {
             throw new HeaderMissingException(
-                'No signed response header (' . static::HEADER_SIGNATURE_NAME . ') found.'
+                'No signed response header (' . (string) static::HEADER_SIGNATURE_NAME . ') found.'
             );
         }
 
@@ -422,10 +422,10 @@ class Sapient
         SharedAuthenticationKey $key
     ): RequestInterface {
         /** @var array<int, string> */
-        $headers = $request->getHeader(static::HEADER_AUTH_NAME);
+        $headers = $request->getHeader((string) static::HEADER_AUTH_NAME);
         if (!$headers) {
             throw new HeaderMissingException(
-                'No signed request header (' . static::HEADER_AUTH_NAME . ') found.'
+                'No signed request header (' . (string) static::HEADER_AUTH_NAME . ') found.'
             );
         }
 
@@ -460,10 +460,10 @@ class Sapient
         SharedAuthenticationKey $key
     ): ResponseInterface {
         /** @var array<int, string> */
-        $headers = $response->getHeader(static::HEADER_SIGNATURE_NAME);
+        $headers = $response->getHeader((string) static::HEADER_SIGNATURE_NAME);
         if (!$headers) {
             throw new HeaderMissingException(
-                'No signed response header (' . static::HEADER_SIGNATURE_NAME . ') found.'
+                'No signed response header (' . (string) static::HEADER_SIGNATURE_NAME . ') found.'
             );
         }
 

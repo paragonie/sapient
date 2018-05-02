@@ -246,7 +246,8 @@ class Stream implements StreamInterface
                 throw new \TypeError();
             }
             $stats = \fstat($this->stream);
-            $this->size = isset($stats['size']) && !$this->isPipe() ? $stats['size'] : null;
+            /** @var int|null size */
+            $this->size = isset($stats['size']) && !$this->isPipe() ? (int) $stats['size'] : null;
         }
 
         return $this->size;
@@ -272,7 +273,7 @@ class Stream implements StreamInterface
             $position = 0;
         }
 
-        return $position;
+        return (int) $position;
     }
 
     /**
@@ -302,7 +303,9 @@ class Stream implements StreamInterface
             } else {
                 $this->readable = false;
                 if ($this->isAttached()) {
+                    /** @var array<string, string> $meta */
                     $meta = $this->getMetadata();
+                    /** @var string $mode */
                     foreach (self::$modes['readable'] as $mode) {
                         if (strpos($meta['mode'], $mode) === 0) {
                             $this->readable = true;
@@ -326,7 +329,9 @@ class Stream implements StreamInterface
         if ($this->writable === null) {
             $this->writable = false;
             if ($this->isAttached()) {
+                /** @var array<string, string> $meta */
                 $meta = $this->getMetadata();
+                /** @var string $mode */
                 foreach (self::$modes['writable'] as $mode) {
                     if (\strpos($meta['mode'], $mode) === 0) {
                         $this->writable = true;
@@ -349,6 +354,7 @@ class Stream implements StreamInterface
         if ($this->seekable === null) {
             $this->seekable = false;
             if ($this->isAttached()) {
+                /** @var array<string, bool|int|string> $meta */
                 $meta = $this->getMetadata();
                 $this->seekable = !$this->isPipe() && $meta['seekable'];
             }
@@ -433,7 +439,7 @@ class Stream implements StreamInterface
             $data = '';
         }
 
-        return $data;
+        return (string) $data;
     }
 
     /**
@@ -461,7 +467,7 @@ class Stream implements StreamInterface
         // reset size so that it will be recalculated on next call to getSize()
         $this->size = null;
 
-        return $written;
+        return (int) $written;
     }
 
     /**
@@ -485,7 +491,7 @@ class Stream implements StreamInterface
             $contents = '';
         }
 
-        return $contents;
+        return (string) $contents;
     }
 
     /**
@@ -502,7 +508,7 @@ class Stream implements StreamInterface
                 if (!\is_resource($this->stream)) {
                     throw new \TypeError();
                 }
-                $mode = \fstat($this->stream)['mode'];
+                $mode = (int) \fstat($this->stream)['mode'];
                 $this->isPipe = ($mode & self::FSTAT_MODE_S_IFIFO) !== 0;
             }
         }
