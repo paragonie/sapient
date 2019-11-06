@@ -9,7 +9,7 @@
 TLS security breakdown (compromised certificate authority, etc.).
 
 Sapient allows you to quickly and easily add application-layer cryptography to your API requests
-and responses. **Requires PHP 7.**
+and responses. **Requires PHP 7 or newer.**
 
 Sapient was designed and implemented by [the PHP security and cryptography team at Paragon Initiative Enterprises](https://paragonie.com).
 
@@ -70,6 +70,10 @@ If your framework correctly implements PSR-7, you most likely do not need an ada
 some adapters provide convenience methods that make rapid development easier.
 
 To learn more about adapters, see [the documentation for `AdapterInterface`](docs/Internals/Adapter/AdapterInterface.md).
+
+## Sapient in Other Languages
+
+* [sapient.js](https://github.com/paragonie/sapient-js) (JavaScript, Node.js)
 
 ## Example 1: Signed PSR-7 Responses
 
