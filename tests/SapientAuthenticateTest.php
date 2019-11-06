@@ -5,6 +5,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Adapter\Guzzle;
+use ParagonIE\Sapient\Exception\InvalidMessageException;
 use ParagonIE\Sapient\CryptographyKeys\{
     SharedAuthenticationKey
 };
@@ -44,7 +45,7 @@ class SapientAuthenticateTest extends TestCase
                 )
             )
             ],
-            ['structued' => [
+            ['structured' => [
                 'abc' => 'def',
                 'o' => null,
                 'ghi' => ['j', 'k', 'l'],
@@ -75,6 +76,25 @@ class SapientAuthenticateTest extends TestCase
             );
             $body = json_decode((string)$decoded->getBody(), true);
             $this->assertSame($obj, $body);
+            
+            // Test the unhappy path
+            $bad = $obj;
+            $bad['bad'] = true;
+            $badRequest = $guzzle->createSymmetricAuthenticatedJsonRequest(
+                'POST',
+                '/',
+                $obj,
+                $this->sharedAuthenticationKey
+            )->withBody(
+                $this->sapient->getAdapter()->stringToStream((string) json_encode($bad))
+            );
+            try {
+                $this->sapient->verifySymmetricAuthenticatedRequest($badRequest, $this->sharedAuthenticationKey);
+                $this->fail('Invalid message accepted');
+            } catch (InvalidMessageException $ex) {
+                // Expected
+                $this->assertInstanceOf(InvalidMessageException::class, $ex);
+            }
         }
     }
 
@@ -97,6 +117,24 @@ class SapientAuthenticateTest extends TestCase
             );
             $body = json_decode((string)$decoded->getBody(), true);
             $this->assertSame($obj, $body);
+
+            // Test the unhappy path
+            $bad = $obj;
+            $bad['bad'] = true;
+            $badResponse = $guzzle->createSymmetricAuthenticatedJsonResponse(
+                200,
+                $obj,
+                $this->sharedAuthenticationKey
+            )->withBody(
+                $this->sapient->getAdapter()->stringToStream((string) json_encode($bad))
+            );
+            try {
+                $this->sapient->verifySymmetricAuthenticatedResponse($badResponse, $this->sharedAuthenticationKey);
+                $this->fail('Invalid message accepted');
+            } catch (InvalidMessageException $ex) {
+                // Expected
+                $this->assertInstanceOf(InvalidMessageException::class, $ex);
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use ParagonIE\Sapient\Adapter\Guzzle;
+use ParagonIE\Sapient\Exception\InvalidMessageException;
 use ParagonIE\Sapient\CryptographyKeys\{
     SharedAuthenticationKey,
     SharedEncryptionKey
@@ -84,6 +85,8 @@ class SapientSymmetricTest extends TestCase
                     SharedEncryptionKey::generate()
                 );
                 $this->fail('Decryption permitted under invalid key');
+            } catch (InvalidMessageException $ex) {
+                // Expected outcome
             } catch (\SodiumException $ex) {
                 // Expected outcome
             } catch (\Error $ex) {
@@ -123,6 +126,8 @@ class SapientSymmetricTest extends TestCase
                 SharedEncryptionKey::generate()
             );
             $this->fail('Decryption permitted under invalid key');
+        } catch (InvalidMessageException $ex) {
+            // Expected outcome
         } catch (\SodiumException $ex) {
             // Expected outcome
         } catch (\Error $ex) {
@@ -155,6 +160,8 @@ class SapientSymmetricTest extends TestCase
                     SharedEncryptionKey::generate()
                 );
                 $this->fail('Decryption permitted under invalid key');
+            } catch (InvalidMessageException $ex) {
+                // Expected outcome
             } catch (\SodiumException $ex) {
                 // Expected outcome
             } catch (\Error $ex) {
@@ -193,6 +200,8 @@ class SapientSymmetricTest extends TestCase
                 SharedEncryptionKey::generate()
             );
             $this->fail('Decryption permitted under invalid key');
+        } catch (InvalidMessageException $ex) {
+            // Expected outcome
         } catch (\SodiumException $ex) {
             // Expected outcome
         } catch (\Error $ex) {
