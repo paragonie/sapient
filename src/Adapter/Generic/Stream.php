@@ -146,10 +146,11 @@ class Stream implements StreamInterface
      * @return void
      *
      * @throws \InvalidArgumentException If argument is not a valid PHP resource.
+     * @psalm-suppress DocblockTypeContradiction
      */
     protected function attach($newStream)
     {
-        if (\is_resource($newStream) === false) {
+        if (!\is_resource($newStream)) {
             throw new \InvalidArgumentException(__METHOD__ . ' argument must be a valid PHP resource');
         }
 
@@ -266,13 +267,14 @@ class Stream implements StreamInterface
         if (!\is_resource($this->stream)) {
             throw new \TypeError();
         }
-        if (!$this->isAttached() || ($position = \ftell($this->stream)) === false || $this->isPipe()) {
+        if (!$this->isAttached() || $this->isPipe()) {
             throw new \RuntimeException('Could not get the position of the pointer in stream');
         }
-        if (!isset($position)) {
-            $position = 0;
+        /** @var int|false $position */
+        $position = \ftell($this->stream);
+        if (!\is_int($position)) {
+            throw new \RuntimeException('Could not get the position of the pointer in stream');
         }
-
         return (int) $position;
     }
 
@@ -525,7 +527,7 @@ class Stream implements StreamInterface
      */
     public static function fromString(string $input): StreamInterface
     {
-        /** @var resource $stream */
+        /** @var resource|bool $stream */
         $stream = \fopen('php://temp', 'w+');
         if (!\is_resource($stream)) {
             throw new \Error('Could not create stream');
