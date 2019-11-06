@@ -460,10 +460,10 @@ class Sapient
         SharedAuthenticationKey $key
     ): ResponseInterface {
         /** @var array<int, string> */
-        $headers = $response->getHeader((string) static::HEADER_SIGNATURE_NAME);
+        $headers = $response->getHeader((string) static::HEADER_AUTH_NAME);
         if (!$headers) {
             throw new HeaderMissingException(
-                'No signed response header (' . (string) static::HEADER_SIGNATURE_NAME . ') found.'
+                'No signed response header (' . (string) static::HEADER_AUTH_NAME . ') found.'
             );
         }
 
