@@ -180,7 +180,7 @@ function signRequest(
 
 function signResponse(
     ResponseInterface $response,
-    SigningPublicKey $publicKey
+    SigningSecretKey $publicKey
 ): ResponseInterface;
 ```
 
@@ -200,7 +200,7 @@ Function prototypes:
 ```php
 function verifySignedRequest(
     RequestInterface $request,
-    SigningSecretKey $secretKey
+    SigningPublicKey $secretKey
 ): RequestInterface;
 
 function verifySignedResponse(
