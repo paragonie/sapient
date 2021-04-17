@@ -582,6 +582,8 @@ class Guzzle implements AdapterInterface, ConvenienceInterface
      * @param string $input
      * @return StreamInterface
      * @throws \TypeError
+     *
+     * @psalm-suppress DeprecatedFunction
      */
     public function stringToStream(string $input): StreamInterface
     {

@@ -11,8 +11,9 @@ class GenericTest extends TestCase
     protected $adapter;
     /**
      * Populate the methods.
+     * @before
      */
-    public function setup()
+    public function before()
     {
         $this->adapter = new Adapter();
     }

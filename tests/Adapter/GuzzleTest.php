@@ -53,8 +53,9 @@ class GuzzleTest extends TestCase
 
     /**
      * Populate the methods.
+     * @before
      */
-    public function setup()
+    public function before()
     {
         if (!\class_exists('GuzzleHttp\Client')) {
             $this->markTestSkipped('Guzzle not included as a dependency.');
