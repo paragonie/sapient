@@ -1,6 +1,6 @@
 # Sapient: Secure API toolkit
 
-[![Build Status](https://github.com/paragonie/sapient/actions/workflows/ci.yml/badge.svg)](https://github.com/sapient/actions)
+[![Build Status](https://github.com/paragonie/sapient/actions/workflows/ci.yml/badge.svg)](https://github.com/paragonie/sapient/actions)
 [![Latest Stable Version](https://poser.pugx.org/paragonie/sapient/v/stable)](https://packagist.org/packages/paragonie/sapient)
 [![Latest Unstable Version](https://poser.pugx.org/paragonie/sapient/v/unstable)](https://packagist.org/packages/paragonie/sapient)
 [![License](https://poser.pugx.org/paragonie/sapient/license)](https://packagist.org/packages/paragonie/sapient)
