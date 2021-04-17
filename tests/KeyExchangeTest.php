@@ -27,8 +27,9 @@ class KeyExchangeTest extends TestCase
 
     /**
      * Setup the class properties
+     * @before
      */
-    public function setUp()
+    public function before()
     {
         $this->clientSealSecret = SealingSecretKey::generate();
         $this->clientSealPublic = $this->clientSealSecret->getPublickey();

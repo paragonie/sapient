@@ -50,7 +50,8 @@ class SealingSecretKey extends CryptographyKey
                 $this->getString(true),
                 $publicKey->getString(true),
                 $publicKey->getString(true),
-                $this->getPublickey()->getString(true)
+                $this->getPublickey()->getString(true),
+                true
             );
         } else {
             // You are the client:
@@ -58,7 +59,8 @@ class SealingSecretKey extends CryptographyKey
                 $this->getString(true),
                 $publicKey->getString(true),
                 $this->getPublickey()->getString(true),
-                $publicKey->getString(true)
+                $publicKey->getString(true),
+                true
             );
         }
         return new SharedEncryptionKey($shared);

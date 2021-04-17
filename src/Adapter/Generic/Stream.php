@@ -39,7 +39,7 @@ class Stream implements StreamInterface
     /**
      * The underlying stream resource
      *
-     * @var resource|null
+     * @var resource|closed-resource|null
      */
     protected $stream;
 

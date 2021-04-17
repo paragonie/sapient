@@ -52,8 +52,9 @@ class SapientSymmetricTest extends TestCase
 
     /**
      * Setup the class properties
+     * @before
      */
-    public function setUp()
+    public function before()
     {
         $this->sapient = new Sapient(new Guzzle());
         $this->sharedEncryptionKey = SharedEncryptionKey::generate();

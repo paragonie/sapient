@@ -1,13 +1,27 @@
 <?xml version="1.0"?>
 <psalm
+    autoloader="phpunit-autoload.php"
     useDocblockTypes="true"
     totallyTyped="true"
 >
     <projectFiles>
         <directory name="src" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
     </projectFiles>
     <issueHandlers>
+        <MoreSpecificImplementedParamType errorLevel="suppress" /><!-- this is fine -->
+        <RedundantConditionGivenDocblockType errorLevel="suppress" /><!-- we're being explicit -->
+        <RedundantCastGivenDocblockType errorLevel="suppress" /><!-- we're being explicit -->
+        <DocblockTypeContradiction errorLevel="info" /><!-- We're still supporting PHP 5 -->
+        <UnnecessaryVarAnnotation errorLevel="suppress" />
+        <UnusedFunctionCall errorLevel="info" />
+        <UnusedVariable errorLevel="info" />
+        <RedundantCast errorLevel="suppress" />
+        <MixedReturnTypeCoercion errorLevel="info" />
         <InternalMethod errorLevel="suppress" />
         <RedundantConditionGivenDocblockType errorLevel="info" />
+        <UnsafeInstantiation errorLevel="info" />
     </issueHandlers>
 </psalm>
