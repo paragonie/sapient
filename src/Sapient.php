@@ -84,7 +84,7 @@ class Sapient
         SharedAuthenticationKey $key
     ): RequestInterface {
         $mac = \ParagonIE_Sodium_Compat::crypto_auth(
-            (string) clone $request->getBody(),
+            (string) (clone $request)->getBody(),
             $key->getString(true)
         );
         return $request->withAddedHeader(
@@ -105,7 +105,7 @@ class Sapient
         SharedAuthenticationKey $key
     ): ResponseInterface {
         $mac = \ParagonIE_Sodium_Compat::crypto_auth(
-            (string) clone $response->getBody(),
+            (string) (clone $response)->getBody(),
             $key->getString(true)
         );
         return $response->withAddedHeader(
@@ -254,7 +254,7 @@ class Sapient
         SigningSecretKey $secretKey
     ): RequestInterface {
         $signature = \ParagonIE_Sodium_Compat::crypto_sign_detached(
-            (string) clone $request->getBody(),
+            (string) (clone $request)->getBody(),
             $secretKey->getString(true)
         );
         return $request->withAddedHeader(
@@ -275,7 +275,7 @@ class Sapient
         SigningSecretKey $secretKey
     ): ResponseInterface {
         $signature = \ParagonIE_Sodium_Compat::crypto_sign_detached(
-            (string) clone $response->getBody(),
+            (string) (clone $response)->getBody(),
             $secretKey->getString(true)
         );
         return $response->withAddedHeader(
@@ -338,6 +338,7 @@ class Sapient
      * @return RequestInterface
      * @throws HeaderMissingException
      * @throws InvalidMessageException
+     * @throws SodiumException
      */
     public function verifySignedRequest(
         RequestInterface $request,
@@ -351,7 +352,7 @@ class Sapient
             );
         }
 
-        $body = (string) clone $request->getBody();
+        $body = (string) (clone $request)->getBody();
         foreach ($headers as $head) {
             $result = \ParagonIE_Sodium_Compat::crypto_sign_verify_detached(
                 Base64UrlSafe::decode($head),
@@ -390,7 +391,7 @@ class Sapient
             );
         }
 
-        $body = (string) clone $response->getBody();
+        $body = (string) (clone $response)->getBody();
         foreach ($headers as $head) {
             $result = \ParagonIE_Sodium_Compat::crypto_sign_verify_detached(
                 Base64UrlSafe::decode($head),
@@ -429,7 +430,7 @@ class Sapient
             );
         }
 
-        $body = (string) clone $request->getBody();
+        $body = (string) (clone $request)->getBody();
         foreach ($headers as $head) {
             $result = \ParagonIE_Sodium_Compat::crypto_auth_verify(
                 Base64UrlSafe::decode($head),
@@ -467,7 +468,7 @@ class Sapient
             );
         }
 
-        $body = (string) clone $response->getBody();
+        $body = (string) (clone $response)->getBody();
         foreach ($headers as $head) {
             $result = \ParagonIE_Sodium_Compat::crypto_auth_verify(
                 Base64UrlSafe::decode($head),
