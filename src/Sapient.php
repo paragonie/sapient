@@ -23,6 +23,7 @@ use Psr\Http\Message\{
     ResponseInterface,
     StreamInterface
 };
+use SodiumException;
 
 /**
  * Class Sapient
@@ -378,6 +379,7 @@ class Sapient
      * @return ResponseInterface
      * @throws HeaderMissingException
      * @throws InvalidMessageException
+     * @throws SodiumException
      */
     public function verifySignedResponse(
         ResponseInterface $response,
@@ -417,6 +419,7 @@ class Sapient
      * @return RequestInterface
      * @throws HeaderMissingException
      * @throws InvalidMessageException
+     * @throws SodiumException
      */
     public function verifySymmetricAuthenticatedRequest(
         RequestInterface $request,
@@ -455,6 +458,7 @@ class Sapient
      * @return ResponseInterface
      * @throws HeaderMissingException
      * @throws InvalidMessageException
+     * @throws SodiumException
      */
     public function verifySymmetricAuthenticatedResponse(
         ResponseInterface $response,
