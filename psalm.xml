@@ -2,7 +2,6 @@
 <psalm
     autoloader="phpunit-autoload.php"
     useDocblockTypes="true"
-    totallyTyped="true"
 >
     <projectFiles>
         <directory name="src" />
