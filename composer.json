@@ -5,13 +5,13 @@
   "require": {
     "php": "^7|^8",
     "guzzlehttp/psr7": "^1",
-    "paragonie/constant_time_encoding": "^2",
-    "paragonie/sodium_compat": ">= 1.15.4",
+    "paragonie/constant_time_encoding": "^2|^3",
+    "paragonie/sodium_compat": ">= 1.15.4 || >= 2.1",
     "psr/http-message": "^1"
   },
   "require-dev": {
-    "guzzlehttp/guzzle": "^6|^7",
-    "phpunit/phpunit": "^6|^7|^8|^9",
+    "guzzlehttp/guzzle": "^7",
+    "phpunit/phpunit": "^6|^7|^8|^9|^10",
     "vimeo/psalm": "^2|^3|^4"
   },
   "suggest": {

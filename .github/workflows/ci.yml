@@ -8,12 +8,12 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: ['ubuntu-18.04']
+        operating-system: ['ubuntu-latest']
         php-versions: ['7.0']
         phpunit-versions: ['7.5.20']
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -24,7 +24,7 @@ jobs:
           tools: psalm, phpunit:${{ matrix.phpunit-versions }}
 
       - name: Install dependencies
-        run: composer self-update --1; composer install
+        run: composer self-update; composer remove --dev vimeo/psalm; composer install
 
       - name: PHPUnit tests
         uses: php-actions/phpunit@v2
@@ -41,7 +41,7 @@ jobs:
         phpunit-versions: ['latest']
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -66,7 +66,7 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-latest']
-        php-versions: ['7.4', '8.0', '8.1']
+        php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
         phpunit-versions: ['latest']
     steps:
       - name: Checkout
