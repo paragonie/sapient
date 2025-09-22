@@ -23,6 +23,9 @@ jobs:
           ini-values: max_execution_time=600, memory_limit=256M, error_reporting=-1, display_errors=On
           coverage: none
 
+      - name: Remove psalm
+        run: composer remove --dev vimeo/psalm
+
       - name: Install Composer dependencies
         run: composer update
 
